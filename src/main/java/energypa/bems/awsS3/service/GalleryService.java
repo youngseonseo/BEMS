@@ -19,7 +19,7 @@ public class GalleryService {
     private S3Service s3Service;
     private GalleryRepository galleryRepository;
 
-    public Long savePost(GalleryDto galleryDto) {
+    public Long saveMember(GalleryDto galleryDto) {
         GalleryEntity save = galleryRepository.save(galleryDto.toEntity());
         Long id = save.getId();
         return id;
@@ -39,8 +39,6 @@ public class GalleryService {
     private GalleryDto convertEntityToDto(GalleryEntity galleryEntity) {
         return GalleryDto.builder()
                 .id(galleryEntity.getId())
-                .title(galleryEntity.getTitle())
-                .filePath(galleryEntity.getFilePath())
                 .imgFullPath("https://" + galleryEntity.getFilePath())
                 .build();
     }

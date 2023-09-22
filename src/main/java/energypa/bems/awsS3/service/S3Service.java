@@ -52,7 +52,7 @@ public class S3Service implements ApplicationListener<ApplicationStartedEvent> {
     public String upload(MultipartFile file) throws IOException {
         // 고유한 key 값을 갖기위해 현재 시간을 postfix로 붙여줌
         SimpleDateFormat date = new SimpleDateFormat("yyyymmddHHmmss");
-        String fileName = file.getOriginalFilename() + "-" + date.format(new Date());
+        String fileName = "https://"+file.getOriginalFilename() + "-" + date.format(new Date());
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());

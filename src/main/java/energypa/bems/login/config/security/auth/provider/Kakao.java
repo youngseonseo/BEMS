@@ -37,17 +37,6 @@ public class Kakao extends OAuth2UserInfo {
     }
 
     @Override
-    public String getImageUrl() {
-        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
-
-        if (properties == null) {
-            return null;
-        }
-
-        return (String) properties.get("thumbnail_image");
-    }
-
-    @Override
     public String getProvider(){
         return Provider.kakao.toString();
     }

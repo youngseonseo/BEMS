@@ -1,5 +1,7 @@
 package energypa.bems.login.service;
 
+import energypa.bems.awsS3.domain.entity.GalleryEntity;
+import energypa.bems.awsS3.domain.repository.GalleryRepository;
 import energypa.bems.login.advice.assertThat.DefaultAssert;
 import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.login.domain.*;
@@ -14,6 +16,7 @@ import energypa.bems.login.repository.MemberRepository;
 import energypa.bems.login.repository.TokenRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +29,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Optional;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -36,6 +41,7 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
+    private final GalleryRepository galleryRepository;
 
 
     public ResponseEntity<?> whoAmI(UserPrincipal userPrincipal){
@@ -100,7 +106,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> signup(SignUpRequest signUpRequest){
-        DefaultAssert.isTrue(!memberRepository.existsByEmail(signUpRequest.getEmail()), "해당 이메일이 존재하지 않습니다.");
+        DefaultAssert.isTrue(!memberRepository.existsByEmail(signUpRequest.getEmail()), "해당 이메일이 이미 존재합니다.");
 
         Member member = Member.builder()
                 .username(signUpRequest.getName())
@@ -109,8 +115,21 @@ public class AuthService {
                 .provider(Provider.local)
                 .authority(Authority.USER)
                 .build();
-        memberRepository.save(member);
 
+        Long galleryId = signUpRequest.getGalleryId();
+
+        if(galleryId!=null){
+            Optional<GalleryEntity> gallery = galleryRepository.findById(galleryId);
+            if(gallery.isPresent()){
+                GalleryEntity galleryEntity = gallery.get();
+                member.setGallery(galleryEntity);
+            }
+        }
+
+        Member savedMember = memberRepository.save(member);
+        if(galleryId != null){
+            galleryRepository.updateGallery(galleryId,savedMember);
+        }
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/auth/")
                 .buildAndExpand(member.getId()).toUri();

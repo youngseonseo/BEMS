@@ -20,4 +20,6 @@ public class SignUpRequest {
     @Schema( type = "string", example = "string", description="계정 비밀번호 입니다.")
     @NotBlank
     private String password;
+
+    private Long galleryId;
 }

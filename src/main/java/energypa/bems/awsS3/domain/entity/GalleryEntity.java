@@ -1,6 +1,6 @@
 package energypa.bems.awsS3.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import energypa.bems.login.domain.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -15,26 +15,24 @@ import lombok.NoArgsConstructor;
 @Entity(name = "gallery")
 @Table(name = "gallery")
 public class GalleryEntity {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "gallery_id")
     private Long id;
-
-    @Column(length = 50)
-    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String filePath;
 
-    @ManyToOne
-    @JsonBackReference
+    @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "member_id")
     private Member member;
 
 
     @Builder
-    public GalleryEntity(Long id, String title, String filePath,Member member) {
+    public GalleryEntity(Long id, String filePath,Member member) {
         this.id = id;
-        this.title = title;
         this.filePath = filePath;
         this.member=member;
     }

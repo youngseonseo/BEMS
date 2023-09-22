@@ -1,7 +1,11 @@
 package energypa.bems.login.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import energypa.bems.awsS3.domain.entity.GalleryEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 
 @Entity
@@ -14,7 +18,7 @@ import lombok.*;
 public class Member {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "member_id")
     public Long id;
 
@@ -33,14 +37,17 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    private String imageUrl;
 
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private GalleryEntity gallery;
 
     public void updateName(String name){
         this.username = username;
     }
 
-    public void updateImageUrl(String imageUrl){
-        this.imageUrl = imageUrl;
+    public void updateGallery(GalleryEntity gallery){
+        this.gallery = gallery;
     }
+
 }

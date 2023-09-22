@@ -49,10 +49,9 @@ public class GalleryController {
         GalleryDto galleryDto = new GalleryDto();
         String imgPath = s3Service.upload(file);
 
-        galleryDto.setFilePath(imgPath);
         galleryDto.setImgFullPath(CLOUD_FRONT_DOMAIN_NAME+"/"+imgPath);
 
-        return ResponseEntity.ok(galleryService.savePost(galleryDto));
+        return ResponseEntity.ok(galleryService.saveMember(galleryDto));
     }
 
 
