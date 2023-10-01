@@ -36,7 +36,7 @@ public class GalleryController {
     @ApiResponse(responseCode = "200", description = "이미지 조회 성공")
     )
     @GetMapping("/gallery")
-    public  List<GalleryDto> dispWrite(Model model) {
+    public  List<GalleryDto> dispWrite() {
         List<GalleryDto> galleryDtoList = galleryService.getList();
         return galleryDtoList;
     }
