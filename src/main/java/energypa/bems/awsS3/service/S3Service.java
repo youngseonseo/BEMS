@@ -37,7 +37,7 @@ public class S3Service implements ApplicationListener<ApplicationStartedEvent> {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    public static final String CLOUD_FRONT_DOMAIN_NAME = "pdfresource.s3.ap-northeast-2.amazonaws.com";
+    public static final String CLOUD_FRONT_DOMAIN_NAME = "https://sys-s3-bucket.s3.ap-northeast-2.amazonaws.com";
 
     @PostConstruct
     public void setS3Client() {
@@ -50,9 +50,16 @@ public class S3Service implements ApplicationListener<ApplicationStartedEvent> {
     }
 
     public String upload(MultipartFile file) throws IOException {
+
+        String contentType = file.getContentType();
+
+        // 확장자가 jpeg, jpg, gif, png가 아니면 업로드 실패
+        if(!(contentType.contains("image/jpeg")||contentType.contains("image/jpg")||contentType.contains("image/png")||contentType.contains("image/gif"))) {
+            throw new IllegalArgumentException("이미지 확장자가 올바르지 않습니다.");
+        }
         // 고유한 key 값을 갖기위해 현재 시간을 postfix로 붙여줌
         SimpleDateFormat date = new SimpleDateFormat("yyyymmddHHmmss");
-        String fileName = "https://"+file.getOriginalFilename() + "-" + date.format(new Date());
+        String fileName = file.getOriginalFilename() + "-" + date.format(new Date());
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());

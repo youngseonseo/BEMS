@@ -39,7 +39,7 @@ public class GalleryService {
     private GalleryDto convertEntityToDto(GalleryEntity galleryEntity) {
         return GalleryDto.builder()
                 .id(galleryEntity.getId())
-                .imgFullPath("https://" + galleryEntity.getFilePath())
+                .imgFullPath(galleryEntity.getFilePath())
                 .build();
     }
 
