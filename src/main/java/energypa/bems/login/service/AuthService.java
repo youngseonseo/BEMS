@@ -124,6 +124,9 @@ public class AuthService {
                 GalleryEntity galleryEntity = gallery.get();
                 member.setGallery(galleryEntity);
             }
+            else{
+                throw new IllegalArgumentException("해당 이미지가 존재하지 않습니다.");
+            }
         }
 
         Member savedMember = memberRepository.save(member);
