@@ -4,10 +4,7 @@ import energypa.bems.login.advice.payload.ErrorResponse;
 import energypa.bems.login.config.security.token.CurrentUser;
 import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.login.domain.Member;
-import energypa.bems.login.payload.request.auth.ChangePasswordRequest;
-import energypa.bems.login.payload.request.auth.RefreshTokenRequest;
-import energypa.bems.login.payload.request.auth.SignInRequest;
-import energypa.bems.login.payload.request.auth.SignUpRequest;
+import energypa.bems.login.payload.request.auth.*;
 import energypa.bems.login.payload.response.AuthResponse;
 import energypa.bems.login.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -122,10 +119,15 @@ public class AuthController {
         return authService.signout(tokenRefreshRequest);
     }
 
+
     @PostMapping("/checkIdDuplicate")
-    public ResponseEntity checkId(@RequestBody Map<String,Object> requestMap){
-        System.out.println("email = " + requestMap.get("email").toString());
-        if( authService.checkId(requestMap.get("email").toString())){
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "등록된 회원이 아님", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "등록된 회원임", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    public ResponseEntity checkId(@RequestBody DuplicateRequest duplicateRequest){
+
+        if(authService.checkId(duplicateRequest.getEmail())){
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         else{
