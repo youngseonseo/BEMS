@@ -1,4 +1,4 @@
-package energypa.bems.csvAPI;
+package energypa.bems.energy.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,24 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 
+@Service
+public class CsvReadService {
 
-@RestController
-@RequestMapping("/api")
-@CrossOrigin
-@Tag(name="csv Read API", description = "csv 파일 읽기 API")
-public class csvReadController {
-
-    @GetMapping(value = "/readCsv", produces = "application/json")
-    public ResponseEntity<?> readCsv(){
+    public List<Map<String, Object>> readCsv(){
         // 추후 return 할 데이터 목록
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
 
@@ -55,10 +44,9 @@ public class csvReadController {
                     mapList.add(map);
                 }
             }
-            System.out.println(mapList);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<>(mapList, HttpStatus.OK);
+        return mapList;
     }
 }
