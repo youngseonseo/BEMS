@@ -44,7 +44,7 @@ public class GalleryController {
     @PostMapping(path= "/gallery", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(method = "post", summary = "이미지 등록")
     @ApiResponse(responseCode = "200", description = "이미지 등록 성공")
-    public ResponseEntity<Long> execWrite(@RequestPart(value="file",required = false)  MultipartFile file) throws IOException {
+    public ResponseEntity<String> execWrite(@RequestPart(value="file",required = false)  MultipartFile file) throws IOException {
 
         GalleryDto galleryDto = new GalleryDto();
         String imgPath = s3Service.upload(file);

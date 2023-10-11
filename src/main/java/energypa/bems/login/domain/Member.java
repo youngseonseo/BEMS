@@ -38,16 +38,15 @@ public class Member {
     private Authority authority;
 
 
-    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private GalleryEntity gallery;
+    @Column
+    private String imageUrl;
 
     public void updateName(String name){
         this.username = username;
     }
-
-    public void updateGallery(GalleryEntity gallery){
-        this.gallery = gallery;
+    public void updateImageUrl(String imageUrl){
+        this.imageUrl = imageUrl;
     }
+
 
 }

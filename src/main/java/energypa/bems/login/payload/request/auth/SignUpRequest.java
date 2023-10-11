@@ -21,5 +21,5 @@ public class SignUpRequest {
     @NotBlank
     private String password;
 
-    private Long galleryId;
+    private String ImageUrl;
 }

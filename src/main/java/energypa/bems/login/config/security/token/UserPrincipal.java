@@ -27,13 +27,16 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     private Member member;
 
+    private String imageUrl;
+
     public UserPrincipal(Long id, String email, String name, String password,
-                         Collection<? extends GrantedAuthority> authorities) {
+                         Collection<? extends GrantedAuthority> authorities, String imageUrl) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.password = password;
         this.authorities = authorities;
+        this.imageUrl=imageUrl;
     }
 
     public static UserPrincipal create(Member member) {
@@ -43,7 +46,8 @@ public class UserPrincipal implements OAuth2User, UserDetails {
                 member.getEmail(),
                 member.getUsername(),
                 member.getPassword(),
-                authorities
+                authorities,
+                member.getImageUrl()
         );
     }
 
@@ -54,7 +58,8 @@ public class UserPrincipal implements OAuth2User, UserDetails {
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
-                ", attributes=" + attributes +
+                ", attributes=" + attributes + '\'' +
+                ", imageUrl=" + imageUrl + '\'' +
                 '}';
     }
 

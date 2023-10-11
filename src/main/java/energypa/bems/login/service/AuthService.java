@@ -114,25 +114,13 @@ public class AuthService {
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .provider(Provider.local)
                 .authority(Authority.USER)
+                .imageUrl(signUpRequest.getImageUrl())
                 .build();
 
-        Long galleryId = signUpRequest.getGalleryId();
 
-        if(galleryId!=null){
-            Optional<GalleryEntity> gallery = galleryRepository.findById(galleryId);
-            if(gallery.isPresent()){
-                GalleryEntity galleryEntity = gallery.get();
-                member.setGallery(galleryEntity);
-            }
-            else{
-                throw new IllegalArgumentException("해당 이미지가 존재하지 않습니다.");
-            }
-        }
 
         Member savedMember = memberRepository.save(member);
-        if(galleryId != null){
-            galleryRepository.updateGallery(galleryId,savedMember);
-        }
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/auth/")
                 .buildAndExpand(member.getId()).toUri();

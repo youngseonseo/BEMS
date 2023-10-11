@@ -60,6 +60,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
                 .username(oAuth2UserInfo.getName())
                 .email(oAuth2UserInfo.getEmail())
                 .authority(Authority.USER)
+                .imageUrl(oAuth2UserInfo.getImageUrl())
                 .build();
 
         return memberRepository.save(member);
@@ -68,6 +69,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
     private Member updateExistingUser(Member member, OAuth2UserInfo oAuth2UserInfo) {
 
         member.updateName(oAuth2UserInfo.getName());
+        member.updateImageUrl(oAuth2UserInfo.getImageUrl());
 
         return memberRepository.save(member);
     }

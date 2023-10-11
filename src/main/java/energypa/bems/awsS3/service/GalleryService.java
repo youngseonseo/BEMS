@@ -19,10 +19,10 @@ public class GalleryService {
     private S3Service s3Service;
     private GalleryRepository galleryRepository;
 
-    public Long saveMember(GalleryDto galleryDto) {
+    public String saveMember(GalleryDto galleryDto) {
         GalleryEntity save = galleryRepository.save(galleryDto.toEntity());
-        Long id = save.getId();
-        return id;
+        String imageUrl = save.getFilePath();
+        return imageUrl;
     }
 
     public List<GalleryDto> getList() {
