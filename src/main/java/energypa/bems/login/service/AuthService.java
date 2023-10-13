@@ -1,7 +1,5 @@
 package energypa.bems.login.service;
 
-import energypa.bems.awsS3.domain.entity.GalleryEntity;
-import energypa.bems.awsS3.domain.repository.GalleryRepository;
 import energypa.bems.login.advice.assertThat.DefaultAssert;
 import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.login.domain.*;
@@ -41,7 +39,6 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
-    private final GalleryRepository galleryRepository;
 
 
     public ResponseEntity<?> whoAmI(UserPrincipal userPrincipal){

@@ -1,11 +1,7 @@
 package energypa.bems.login.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import energypa.bems.awsS3.domain.entity.GalleryEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 
 @Entity

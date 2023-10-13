@@ -12,5 +12,4 @@ public class UnitCostDto {
     private Integer metroCd;
     private Integer cityCd;
 
-
 }

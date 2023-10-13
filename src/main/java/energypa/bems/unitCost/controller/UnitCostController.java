@@ -21,14 +21,9 @@ public class UnitCostController {
 
     @Operation(method = "get", summary = "해당 시간의 단위 주택용 전력 요금 추출 API")
     @GetMapping("/unitCost")       // 전력 단위 요금
-    public UnitCost circus(@ModelAttribute("unitCostDto") UnitCostDto unitCostDto) throws IOException {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-
+    public UnitCost unitCost(@ModelAttribute("unitCostDto") UnitCostDto unitCostDto) throws IOException {
 
         return apiService.getApi(unitCostDto);
     }
-
-
 
 }

@@ -1,4 +1,4 @@
-package energypa.bems.awsS3.domain.entity;
+package energypa.bems.awsS3.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import energypa.bems.login.domain.Member;

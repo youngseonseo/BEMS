@@ -1,8 +1,8 @@
 package energypa.bems.awsS3.service;
 
 
-import energypa.bems.awsS3.domain.entity.GalleryEntity;
-import energypa.bems.awsS3.domain.repository.GalleryRepository;
+import energypa.bems.awsS3.domain.GalleryEntity;
+import energypa.bems.awsS3.repository.GalleryRepository;
 import energypa.bems.awsS3.dto.GalleryDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Transactional
 public class GalleryService {
-    private S3Service s3Service;
+
     private GalleryRepository galleryRepository;
 
     public String saveMember(GalleryDto galleryDto) {

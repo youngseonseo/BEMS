@@ -1,7 +1,7 @@
-package energypa.bems.awsS3.domain.repository;
+package energypa.bems.awsS3.repository;
 
 
-import energypa.bems.awsS3.domain.entity.GalleryEntity;
+import energypa.bems.awsS3.domain.GalleryEntity;
 import energypa.bems.login.domain.Member;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
