@@ -28,7 +28,7 @@ public class InitEnergyDB {
     CsvReadService csvReadService = new CsvReadService();
 
 
-    @PostConstruct
+    // @PostConstruct
     public void init() {
 
         buildingInit();
