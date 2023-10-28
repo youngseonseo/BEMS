@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CsvReadService {
 
-    public List<Map<String, Object>> readCsv(){
+    public List<Map<String, Object>> readCsv(String filePath){
         // 추후 return 할 데이터 목록
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
 
@@ -24,7 +24,7 @@ public class CsvReadService {
         List<String> headerList = new ArrayList<String>();
 
         try{
-            BufferedReader br = Files.newBufferedReader(Paths.get("preprocessed_data/아파트_동별_소비전력_전력분배_2022-07-18~2023-08-30.csv"));
+            BufferedReader br = Files.newBufferedReader(Paths.get(filePath));
             String line = "";
 
             while((line = br.readLine()) != null){
