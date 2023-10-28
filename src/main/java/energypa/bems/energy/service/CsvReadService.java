@@ -24,7 +24,7 @@ public class CsvReadService {
         List<String> headerList = new ArrayList<String>();
 
         try{
-            BufferedReader br = Files.newBufferedReader(Paths.get("preprocessed_data/아파트_동별_소비전력_2022-07-18~2023-08-30.csv"));
+            BufferedReader br = Files.newBufferedReader(Paths.get("preprocessed_data/아파트_동별_소비전력_전력분배_2022-07-18~2023-08-30.csv"));
             String line = "";
 
             while((line = br.readLine()) != null){

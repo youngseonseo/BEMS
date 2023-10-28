@@ -6,7 +6,6 @@ import lombok.*;
 
 @Entity
 @Data
-@ToString(exclude = {"userRoles"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,7 +23,7 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -32,7 +31,6 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
 
     @Column
     private String imageUrl;
