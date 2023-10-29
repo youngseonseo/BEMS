@@ -1,16 +1,11 @@
 package energypa.bems.login.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import energypa.bems.awsS3.domain.entity.GalleryEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 
 @Entity
 @Data
-@ToString(exclude = {"userRoles"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +23,7 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -36,7 +31,6 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
 
     @Column
     private String imageUrl;

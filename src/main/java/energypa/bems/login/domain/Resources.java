@@ -10,7 +10,6 @@ import java.util.Set;
 @Entity
 @Table(name = "RESOURCES")
 @Data
-@ToString(exclude = {"roleSet"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
