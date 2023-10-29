@@ -44,7 +44,7 @@ public class NotificationController {
         Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
                 new IllegalArgumentException("유저 정보가 없습니다."));
         List<Notification> notifications = notificationRepository.findByMemberAndCheckedOrderByCreatedDesc(member, false);
-        long numberOfChecked = notificationRepository.countByMemberAndChecked(member, true);
+        long numberOfChecked = notificationRepository.countByMemberAndChecked(member, false);
         notificationService.markAsRead(notifications);    // 확인한 알람으로 보내기
 
         return ResponseEntity.ok(new ReceivedNotificationDto(numberOfChecked, notifications));
@@ -57,7 +57,7 @@ public class NotificationController {
         Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
                 new IllegalArgumentException("유저 정보가 없습니다."));
         List<Notification> notifications = notificationRepository.findByMemberAndCheckedOrderByCreatedDesc(member, true);
-        Long numberOfNotChecked = notificationRepository.countByMemberAndChecked(member, false);
+        Long numberOfNotChecked = notificationRepository.countByMemberAndChecked(member, true);
 
         return ResponseEntity.ok(new ReceivedNotificationDto(numberOfNotChecked, notifications));
     }
@@ -83,7 +83,8 @@ public class NotificationController {
         Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
                 new IllegalArgumentException("유저 정보가 없습니다."));
 
-        Notification notification = notificationService.addNotification(sendNotificationDto);
+
+        Notification notification = notificationService.addNotification(sendNotificationDto, member);
 
         // 알림 이벤트 발행 메서드 호출
         notificationService.notifyAddEvent(notification.getId());

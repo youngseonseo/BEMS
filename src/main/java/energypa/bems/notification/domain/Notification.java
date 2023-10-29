@@ -32,17 +32,14 @@ public class Notification {
     private LocalDateTime created;
 
 
-    public static Notification toEntity(SendNotificationDto dto) {
+    public static Notification toEntity(SendNotificationDto dto, Member member) {
         return Notification.builder()
                 .title(dto.getTitle())
                 .message(dto.getMessage())
-                .checked(dto.getChecked())
-                .member(dto.getMember())
-                .created(dto.getCreated())
+                .checked(false)
+                .member(member)
+                .created(LocalDateTime.now())
                 .build();
     }
 
-    public void read() {
-        this.checked = true;
-    }
 }
