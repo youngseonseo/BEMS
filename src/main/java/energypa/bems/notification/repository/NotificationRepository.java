@@ -1,6 +1,6 @@
 package energypa.bems.notification.repository;
 
-import energypa.bems.login.domain.Authority;
+
 import energypa.bems.login.domain.Member;
 import energypa.bems.notification.domain.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;

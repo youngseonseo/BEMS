@@ -22,4 +22,8 @@ public class SignUpRequest {
     private String password;
 
     private String ImageUrl;
+
+    private Integer building;
+
+    private Integer floor;
 }

@@ -62,7 +62,7 @@ public class ApiService {
     }
 
 
-    public UnitCost getApi(UnitCostDto unitCostDto) throws IOException {
+    public Double getApi(UnitCostDto unitCostDto) throws IOException {
 
         LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
         paramMap = paramMapSet(paramMap,unitCostDto);
@@ -99,8 +99,8 @@ public class ApiService {
             List<Map<String, Object>> unitCostList =  (List<Map<String, Object>>) map.get("data");
 
             for(Map<String, Object> item :unitCostList){
-                UnitCost unitCost = new UnitCost((String) item.get("year"),(String) item.get("month"),(String) item.get("metro"),(String) item.get("city"),(String) item.get("cntr"),Double.valueOf(item.get("unitCost").toString()));
-                return unitCost;
+
+                return  Double.valueOf(item.get("unitCost").toString());
             }
 
         } catch (IOException e) {

@@ -1,41 +1,41 @@
 package energypa.bems.energy.domain;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BuildingPerTenMinute {
+public class BuildingEnergyPrice {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name = "buildingPerTenMinute_id")
+    @Column(name = "buildingEnergyPrice_id")
     public Long id;
 
     @Column
-    public Timestamp timestamp;
+    public Integer month;
 
     @Column
-    public Integer building;
-
+    public Integer Building;
     @Column
     public Integer floor;
 
     @Column
-    public Integer consumption;
+    public Integer totalConsumption;
 
-    public BuildingPerTenMinute(Timestamp timestamp, Integer building, Integer floor, Integer consumption) {
-        this.timestamp = timestamp;
-        this.building = building;
+
+    public BuildingEnergyPrice(Integer month, Integer building, Integer floor, Integer totalConsumption) {
+        this.month = month;
+        Building = building;
         this.floor = floor;
-        this.consumption = consumption;
+        this.totalConsumption = totalConsumption;
     }
 }
