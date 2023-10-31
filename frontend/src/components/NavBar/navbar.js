@@ -19,7 +19,7 @@ export default function NavigationBar(props) {
     navigate("/main/monitoring/energy_consumption");
   };
   const onclickbattery = () => {
-    navigate("/main/monitoring/battey");
+    navigate("/main/monitoring/battery");
   };
   const onclickelectonic = () => {
     navigate("/main/monitoring/power_distribution");

@@ -27,8 +27,11 @@ export const SmallButton = styled.button`
   width: 80px;
   height: 35px;
   border-radius: 6px;
-  border: 2px white solid;
+  border: 2px;
   background: #2d3648;
   color: white;
   font-size: 15px;
+  &:hover {
+    border: 3px solid gray;
+  }
 `;

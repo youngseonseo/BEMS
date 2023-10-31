@@ -7,7 +7,7 @@ export default function ElectricDistributionPage() {
     <div>
       <MainHeader />
       <BackGround>
-        <NavigationBar name="energy_consumption" />
+        <NavigationBar name="electronic" />
       </BackGround>
     </div>
   );
