@@ -1,4 +1,4 @@
-package energypa.bems.unitCost.dto;
+package energypa.bems.cost.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -31,11 +31,11 @@ public class InitEnergyDB {
     CsvReadService csvReadService = new CsvReadService();
 
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
-
-        buildingInit();
-        log.info("building init completed!");
+//
+//        buildingInit();
+//        log.info("building init completed!");
         floorInit();
         log.info("Floor init completed");
         buildingPerMinuteInit();
@@ -81,7 +81,7 @@ public class InitEnergyDB {
         List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[1분 단위]아파트_동별_소비전력_전력분배_2022-07-18 00.00.00~2023-08-30 10.39.00.csv");
         for (Map<String, Object> map : maps) {
 
-            BuildingPerMinute buildingPerMinute = new BuildingPerMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")), Double.valueOf((String) map.get("561_bus")), Double.valueOf((String)map.get("562_bus")), Double.valueOf((String) map.get("563_bus")));
+            BuildingPerMinute buildingPerMinute = new BuildingPerMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")), Integer.valueOf((String) map.get("561_bus")), Integer.valueOf((String)map.get("562_bus")), Integer.valueOf((String) map.get("563_bus")));
             buildingPerMinuteRepository.save(buildingPerMinute);
 
         }

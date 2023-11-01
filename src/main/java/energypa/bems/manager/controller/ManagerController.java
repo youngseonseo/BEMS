@@ -2,7 +2,6 @@ package energypa.bems.manager.controller;
 
 import energypa.bems.login.config.security.token.CurrentUser;
 import energypa.bems.login.config.security.token.UserPrincipal;
-import energypa.bems.login.domain.Member;
 import energypa.bems.manager.service.ManagerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 
 import java.util.Map;
-import java.util.Optional;
+
 
 @Slf4j
 @RestController

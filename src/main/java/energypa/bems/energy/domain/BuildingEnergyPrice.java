@@ -24,7 +24,7 @@ public class BuildingEnergyPrice {
     public Integer month;
 
     @Column
-    public Integer Building;
+    public Integer building;
     @Column
     public Integer floor;
 
@@ -34,7 +34,7 @@ public class BuildingEnergyPrice {
 
     public BuildingEnergyPrice(Integer month, Integer building, Integer floor, Integer totalConsumption) {
         this.month = month;
-        Building = building;
+        this.building = building;
         this.floor = floor;
         this.totalConsumption = totalConsumption;
     }
