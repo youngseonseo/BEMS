@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +52,7 @@ public class CalculateService {
             costList.add((int)(ConsumptionAll/100));    // kW기준 전력 사용량 저장
             priceList.add((int)(ConsumptionAll * unitCost)/100);   // 원 기준 전력 요금 저장 -> 10분 단위와 kWh이므로 100을 나누어 주어야 함 (*10 /1000)
         }
+
 
         // 이번 달 실시간 전력 사용량 계산
         Timestamp now = new Timestamp(System.currentTimeMillis());
