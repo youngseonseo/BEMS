@@ -30,12 +30,12 @@ public class BuildingPerTenMinute {
     public Integer floor;
 
     @Column
-    public Integer comsumption;
+    public Integer consumption;
 
-    public BuildingPerTenMinute(Timestamp timestamp, Integer building, Integer floor, Integer comsumption) {
+    public BuildingPerTenMinute(Timestamp timestamp, Integer building, Integer floor, Integer consumption) {
         this.timestamp = timestamp;
         this.building = building;
         this.floor = floor;
-        this.comsumption = comsumption;
+        this.consumption = consumption;
     }
 }

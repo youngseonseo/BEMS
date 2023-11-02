@@ -1,4 +1,4 @@
-package energypa.bems.unitCost.domain;
+package energypa.bems.cost.domain;
 
 import lombok.Data;
 

@@ -39,11 +39,13 @@ public class NotificationService {
     }
 
     public void markAsRead(List<Notification> notifications) {
-        notifications.forEach(Notification::read);
+        for (Notification notification : notifications) {
+            notificationRepository.updateChecked(notification.getId());
+        }
     }
 
-    public Notification addNotification(SendNotificationDto sendNotificationDto) {
-        Notification notification = Notification.toEntity(sendNotificationDto);
+    public Notification addNotification(SendNotificationDto sendNotificationDto, Member member) {
+        Notification notification = Notification.toEntity(sendNotificationDto, member);
         notificationRepository.save(notification);
 
         return notification;

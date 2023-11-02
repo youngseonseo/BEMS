@@ -1,9 +1,8 @@
-package energypa.bems.unitCost.service;
+package energypa.bems.cost.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import energypa.bems.unitCost.domain.UnitCost;
-import energypa.bems.unitCost.dto.UnitCostDto;
+import energypa.bems.cost.dto.UnitCostDto;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +61,7 @@ public class ApiService {
     }
 
 
-    public UnitCost getApi(UnitCostDto unitCostDto) throws IOException {
+    public Double getApi(UnitCostDto unitCostDto) throws IOException {
 
         LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
         paramMap = paramMapSet(paramMap,unitCostDto);
@@ -99,8 +98,8 @@ public class ApiService {
             List<Map<String, Object>> unitCostList =  (List<Map<String, Object>>) map.get("data");
 
             for(Map<String, Object> item :unitCostList){
-                UnitCost unitCost = new UnitCost((String) item.get("year"),(String) item.get("month"),(String) item.get("metro"),(String) item.get("city"),(String) item.get("cntr"),Double.valueOf(item.get("unitCost").toString()));
-                return unitCost;
+
+                return  Double.valueOf(item.get("unitCost").toString());
             }
 
         } catch (IOException e) {
