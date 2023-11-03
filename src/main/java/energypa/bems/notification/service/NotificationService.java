@@ -2,7 +2,9 @@ package energypa.bems.notification.service;
 
 
 
+import energypa.bems.login.domain.Authority;
 import energypa.bems.login.domain.Member;
+import energypa.bems.login.repository.MemberRepository;
 import energypa.bems.notification.domain.Notification;
 import energypa.bems.notification.dto.SendNotificationDto;
 import energypa.bems.notification.repository.NotificationRepository;
@@ -20,6 +22,7 @@ import static energypa.bems.notification.controller.NotificationController.sseEm
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final MemberRepository memberRepository;
 
     public void notifyAddEvent(Long notificationId) {
         // 댓글에 대한 처리 후 해당 댓글이 달린 게시글의 pk값으로 게시글을 조회
@@ -49,5 +52,17 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         return notification;
+    }
+
+    public void serverSendNotification() {    // 서버용 알림 보내기
+
+        SendNotificationDto sendNotificationDto = new SendNotificationDto("전력치 이상 경고 발생", "전력치 이상이 발생하였습니다. 궁금한 점은 시스템 관리자에게 문의하십시오.");
+        List<Member> members = memberRepository.findAllByAuthority(Authority.MANAGER);
+        System.out.println("members = " + members);
+        for (Member member : members) {
+            Notification notification = addNotification(sendNotificationDto, member);
+            // 알림 이벤트 발행 메서드 호출
+            notifyAddEvent(notification.getId());
+        }
     }
 }

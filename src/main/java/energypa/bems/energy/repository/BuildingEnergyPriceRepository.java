@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BuildingEnergyPriceRepository extends JpaRepository<BuildingEnergyPrice, Long> {
 
-    Double findByBuildingAndFloor(Integer building, Integer floor);
 
     @Query(value = "select totalConsumption from BuildingEnergyPrice m where m.month =:month and m.building=:building and m.floor=:floor", nativeQuery = true)
     Double findByBuildingAndFloor(@Param("month") int month, @Param("building") int building, @Param("floor") int floor);
