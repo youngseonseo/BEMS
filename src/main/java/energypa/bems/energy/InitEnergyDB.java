@@ -1,8 +1,10 @@
 package energypa.bems.energy;
 
 import energypa.bems.energy.domain.Building;
+import energypa.bems.energy.domain.BuildingEnergyPrice;
 import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.energy.domain.BuildingPerTenMinute;
+import energypa.bems.energy.repository.BuildingEnergyPriceRepository;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
 import energypa.bems.energy.repository.BuildingRepository;
@@ -25,18 +27,22 @@ public class InitEnergyDB {
     private final BuildingRepository buildingRepository;
     private final BuildingPerTenMinuteRepository buildingPerTenMinuteRepository;
     private final BuildingPerMinuteRepository buildingPerMinuteRepository;
+    private final BuildingEnergyPriceRepository buildingEnergyPriceRepository;
     CsvReadService csvReadService = new CsvReadService();
 
 
-    // @PostConstruct
+//    @PostConstruct
     public void init() {
-
-        buildingInit();
-        log.info("building init completed!");
+//
+//        buildingInit();
+//        log.info("building init completed!");
         floorInit();
         log.info("Floor init completed");
         buildingPerMinuteInit();
         log.info("buildingPerMinute init completed");
+        buildingEnergyPriceInit();
+        log.info("buildingEnergyPrice init completed");
+
 
     }
 
@@ -75,10 +81,45 @@ public class InitEnergyDB {
         List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[1분 단위]아파트_동별_소비전력_전력분배_2022-07-18 00.00.00~2023-08-30 10.39.00.csv");
         for (Map<String, Object> map : maps) {
 
-            BuildingPerMinute buildingPerMinute = new BuildingPerMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")), Double.valueOf((String) map.get("561_bus")), Double.valueOf((String)map.get("562_bus")), Double.valueOf((String) map.get("563_bus")));
+            BuildingPerMinute buildingPerMinute = new BuildingPerMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")), Integer.valueOf((String) map.get("561_bus")), Integer.valueOf((String)map.get("562_bus")), Integer.valueOf((String) map.get("563_bus")));
             buildingPerMinuteRepository.save(buildingPerMinute);
 
         }
+
+
+    }
+
+    public void buildingEnergyPriceInit(){           // 한달 단위 빌딩 에너지 사용량 저장 코드 (4월 ~ 8월)
+        if(buildingEnergyPriceRepository.findById(15L).isPresent()){
+            return;
+        }
+
+        Timestamp startDt = Timestamp.valueOf("2023-03-01 00:00:00");
+        Timestamp betweenEndDt = new Timestamp(startDt.getYear(),startDt.getMonth()+1,startDt.getDate(), startDt.getHours(),startDt.getMinutes(),startDt.getSeconds(), startDt.getNanos());
+        System.out.println("betweenEndDt = " + betweenEndDt);
+        Timestamp endDt = Timestamp.valueOf("2023-09-01 00:00:00");
+
+
+        while(betweenEndDt.before(endDt)) {
+            for(int i=1;i<=18;i++){
+                Integer consumptionByTimeStamp = buildingPerTenMinuteRepository.findConsumptionByTimestampAndBuildingAndFloor(startDt, betweenEndDt, 561 ,i);
+                BuildingEnergyPrice buildingEnergyPrice = new BuildingEnergyPrice(startDt.getMonth(), 561, i, consumptionByTimeStamp);
+                buildingEnergyPriceRepository.save(buildingEnergyPrice);
+            }
+            for(int i=1;i<=24;i++){
+                Integer consumptionByTimeStamp = buildingPerTenMinuteRepository.findConsumptionByTimestampAndBuildingAndFloor(startDt, betweenEndDt, 562 ,i);
+                BuildingEnergyPrice buildingEnergyPrice = new BuildingEnergyPrice(startDt.getMonth(), 562, i, consumptionByTimeStamp);
+                buildingEnergyPriceRepository.save(buildingEnergyPrice);
+            }
+            for(int i=1;i<=24;i++){
+                Integer consumptionByTimeStamp = buildingPerTenMinuteRepository.findConsumptionByTimestampAndBuildingAndFloor(startDt, betweenEndDt, 563 ,i);
+                BuildingEnergyPrice buildingEnergyPrice = new BuildingEnergyPrice(startDt.getMonth(), 563, i, consumptionByTimeStamp);
+                buildingEnergyPriceRepository.save(buildingEnergyPrice);
+            }
+            startDt =betweenEndDt;       // 기간을 한달 후로 설정
+            betweenEndDt = new Timestamp(startDt.getYear(),startDt.getMonth()+1,startDt.getDate(), startDt.getHours(),startDt.getMinutes(),startDt.getSeconds(), startDt.getNanos());
+        }
+
 
 
     }

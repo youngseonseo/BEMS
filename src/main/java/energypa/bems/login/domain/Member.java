@@ -35,6 +35,13 @@ public class Member {
     @Column
     private String imageUrl;
 
+    @Column
+    private Integer building;
+
+    @Column
+    private Integer floor;
+
+
     public void updateName(String name){
         this.username = username;
     }

@@ -17,11 +17,6 @@ public class SendNotificationDto {
 
     private String message;
 
-    private Boolean checked;
-
-    private Member member;
-
-    private LocalDateTime created;
 
 
 }

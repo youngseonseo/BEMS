@@ -34,15 +34,15 @@ public class BuildingPerMinute {
     public Double C_Consumption;
 
     @Column
-    public Double A_bus;
+    public Integer A_bus;
 
     @Column
-    public Double B_bus;
+    public Integer B_bus;
 
     @Column
-    public Double C_bus;
+    public Integer C_bus;
 
-    public BuildingPerMinute(Timestamp timestamp, Double a_Consumption, Double b_Consumption, Double c_Consumption, Double a_bus, Double b_bus, Double c_bus) {
+    public BuildingPerMinute(Timestamp timestamp, Double a_Consumption, Double b_Consumption, Double c_Consumption, Integer a_bus, Integer b_bus, Integer c_bus) {
         this.timestamp = timestamp;
         A_Consumption = a_Consumption;
         B_Consumption = b_Consumption;

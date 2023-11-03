@@ -2,6 +2,7 @@ package energypa.bems.notification.controller;
 
 import energypa.bems.login.config.security.token.CurrentUser;
 import energypa.bems.login.config.security.token.UserPrincipal;
+import energypa.bems.login.domain.Authority;
 import energypa.bems.login.domain.Member;
 import energypa.bems.login.payload.response.ApiResponse;
 import energypa.bems.login.payload.response.Message;
@@ -16,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -44,7 +44,7 @@ public class NotificationController {
         Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
                 new IllegalArgumentException("유저 정보가 없습니다."));
         List<Notification> notifications = notificationRepository.findByMemberAndCheckedOrderByCreatedDesc(member, false);
-        long numberOfChecked = notificationRepository.countByMemberAndChecked(member, true);
+        long numberOfChecked = notificationRepository.countByMemberAndChecked(member, false);
         notificationService.markAsRead(notifications);    // 확인한 알람으로 보내기
 
         return ResponseEntity.ok(new ReceivedNotificationDto(numberOfChecked, notifications));
@@ -57,13 +57,13 @@ public class NotificationController {
         Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
                 new IllegalArgumentException("유저 정보가 없습니다."));
         List<Notification> notifications = notificationRepository.findByMemberAndCheckedOrderByCreatedDesc(member, true);
-        Long numberOfNotChecked = notificationRepository.countByMemberAndChecked(member, false);
+        Long numberOfNotChecked = notificationRepository.countByMemberAndChecked(member, true);
 
         return ResponseEntity.ok(new ReceivedNotificationDto(numberOfNotChecked, notifications));
     }
 
 
-    @Operation(method = "delete", description = "알림 모두 삭제하는 API")
+    @Operation(method = "delete", summary = "알림 모두 삭제하는 API")
     @DeleteMapping("/notifications")
     public ResponseEntity<?> deleteNotifications(@CurrentUser UserPrincipal user) {
         Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
@@ -74,28 +74,11 @@ public class NotificationController {
     }
 
 
-    @Operation(method = "post", description = "클라이언트 개발을 위한 notification 추가하는 APIi")
-    @PostMapping("/notification")
-    public ResponseEntity addNotification(
-            @CurrentUser UserPrincipal user,
-            @RequestBody SendNotificationDto sendNotificationDto) {
 
-        Member member= memberRepository.findById(user.getId()).orElseThrow(() ->
-                new IllegalArgumentException("유저 정보가 없습니다."));
-
-        Notification notification = notificationService.addNotification(sendNotificationDto);
-
-        // 알림 이벤트 발행 메서드 호출
-        notificationService.notifyAddEvent(notification.getId());
-
-        return ResponseEntity.ok("ok");
-    }
-
-
-    @Operation(method="get", description = "SSE 알림 기능 구독하는 API")
+    @Operation(method="get", summary = "SSE 알림 기능 구독하는 API")
     @CrossOrigin
-    @GetMapping(value = "/sub", consumes = MediaType.ALL_VALUE)
-    public SseEmitter subscribe(@CurrentUser UserPrincipal user) {
+    @GetMapping(value = "/sub",  produces=MediaType.TEXT_EVENT_STREAM_VALUE, consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(@CurrentUser UserPrincipal user) {
 
         // 토큰에서 user의 pk값 파싱
         Long userId = user.getId();
@@ -116,7 +99,21 @@ public class NotificationController {
         sseEmitter.onTimeout(() -> sseEmitters.remove(userId));
         sseEmitter.onError((e) -> sseEmitters.remove(userId));
 
-        return sseEmitter;
+        return ResponseEntity.ok().body(sseEmitter);
+    }
+
+    @Operation(method = "post", summary = "클라이언트 개발을 위한 notification 추가하는 API")
+    @PostMapping("/notification/server")
+    public void serverSendNotification() {    // 서버용 알림 보내기
+
+        SendNotificationDto sendNotificationDto = new SendNotificationDto("전력치 이상 경고 발생", "전력치 이상이 발생하였습니다. 궁금한 점은 시스템 관리자에게 문의하십시오.");
+        List<Member> members = memberRepository.findAllByAuthority(Authority.MANAGER);
+        System.out.println("members = " + members);
+        for (Member member : members) {
+            Notification notification = notificationService.addNotification(sendNotificationDto, member);
+            // 알림 이벤트 발행 메서드 호출
+            notificationService.notifyAddEvent(notification.getId());
+        }
     }
 
 }

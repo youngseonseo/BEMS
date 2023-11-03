@@ -3,6 +3,7 @@ package energypa.bems.energy.repository;
 import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.monitoring.dto.EachConsumption;
 import energypa.bems.monitoring.dto.TotalConsumption;
+import energypa.bems.ess.dto.BusDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,4 +45,8 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
             nativeQuery = true
     )
     List<EachConsumption> getMonthlyConsumption(@Param("lastMonth") String lastMonth);
+
+    @Query("select new energypa.bems.ess.dto.BusDto(m.A_bus, m.B_bus, m.C_bus) from BuildingPerMinute m " +
+            "where m.timestamp>=:startDt and m.timestamp<=:endDt")
+    List<BusDto> findA_bus(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt);
 }
