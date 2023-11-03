@@ -6,9 +6,13 @@ Predict = Namespace(
     description="Energy Prediction related APIs"
 )
 
-predict_fields = Predict.model('Predict', {  # Model 객체 생성
-    'data': fields.String(description='a Todo', required=True, example="what to do")
+predict_fields = Predict.model('Predict', {  
+    'TIMESTAMP': fields.DateTime(description='호출 시간대', required=True, example="2018-11-28 07:23:00"),
+    'BUILDING': fields.Integer(description='동', required=True, example="561"),
+    'FLOOR': fields.Integer(description='층', required=True, example="1"),
+    'CONSUMPTION(W)': fields.Integer(description='소비 전력', required=True, example="62")
 })
+
 
 # todo_fields_with_id = Todo.inherit('Todo With ID', todo_fields, {
 #     'todo_id': fields.Integer(description='a Todo ID')
@@ -23,7 +27,7 @@ predict_fields = Predict.model('Predict', {  # Model 객체 생성
 
 @Predict.route('/Elec/')
 class PredictElec(Resource):
-    # @Ess.expect(ess_fields)
+    @Predict.expect(predict_fields)
     # @Todo.response(201, 'Success', todo_fields_with_id)
     def post(self):
         """아파트 층 별 소비 전력 에측 결과를 제공합니다."""
