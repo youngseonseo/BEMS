@@ -26,10 +26,22 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     )
     EachConsumption getYesterdayConsumption(@Param("yesterday") String yesterday);
 
+    @Query(
+            value = "select sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption), date_format(bpm.timestamp, '%Y-%m') from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') = :lastMonth",
+            nativeQuery = true
+    )
+    EachConsumption getLastMonthConsumption(@Param("lastMonth") String lastMonth);
+
     // graph3
     @Query(
             value = "select date(bpm.timestamp), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) <= :yesterday group by date(bpm.timestamp)",
             nativeQuery = true
     )
     List<EachConsumption> getPrevDailyConsumption(@Param("yesterday") String yesterday);
+
+    @Query(
+            value = "select sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption), date_format(bpm.timestamp, '%Y-%m') from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') <= :lastMonth group by date_format(bpm.timestamp, '%Y-%m')",
+            nativeQuery = true
+    )
+    List<EachConsumption> getMonthlyConsumption(@Param("lastMonth") String lastMonth);
 }

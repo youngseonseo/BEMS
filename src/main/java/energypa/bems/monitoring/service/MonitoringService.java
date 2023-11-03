@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -95,6 +96,13 @@ public class MonitoringService {
         return todayDate.minusDays(1L).toString();
     }
 
+    public String getLastMonth() {
+        LocalDateTime todayDate = manipulateNowForBuilding();
+        todayDate = todayDate.minusMonths(1L);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        return todayDate.format(formatter);
+    }
+
     public MonitorBuildingResponse getPrevBuildingInfo(String duration) {
 
         Timestamp now = Timestamp.valueOf(manipulateNowForBuilding());
@@ -104,6 +112,16 @@ public class MonitoringService {
         if (duration.equals("date")) {
             EachConsumption graph2 = buildingRepository.getYesterdayConsumption(getYesterday());
             List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getYesterday());
+
+            monitorBuildingResponse = MonitorBuildingResponse.builder()
+                    .graph1(graph1)
+                    .graph2(graph2)
+                    .graph3(graph3)
+                    .build();
+        }
+        else if (duration.equals("month")) {
+            EachConsumption graph2 = buildingRepository.getLastMonthConsumption(getLastMonth());
+            List<EachConsumption> graph3 = buildingRepository.getMonthlyConsumption(getLastMonth());
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()
                     .graph1(graph1)
