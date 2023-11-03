@@ -3,6 +3,8 @@ package energypa.bems.monitoring.service;
 import energypa.bems.energy.domain.BuildingPerTenMinute;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
+import energypa.bems.login.config.security.token.CurrentUser;
+import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.monitoring.dto.EachConsumption;
 import energypa.bems.monitoring.dto.MonitorBuildingResponse;
 import energypa.bems.monitoring.dto.TotalConsumption;
@@ -27,13 +29,13 @@ public class MonitoringService {
     private final BuildingPerMinuteRepository buildingRepository;
     private final SseRepository sseRepository;
 
-    public SseEmitter formSseConnectionForFloor(int building, int floor) {
+    public SseEmitter formSseConnectionForFloor(int building, int floor, @CurrentUser UserPrincipal userPrincipal) {
 
         // sse 연결
         SseEmitter sseEmitter = new SseEmitter();
 
         // 생성한 SseEmitter 객체 저장
-        sseRepository.saveForFloor(sseEmitter, building, floor);
+        sseRepository.saveForFloor(sseEmitter, building, floor, userPrincipal);
 
         // sse 연결 후 dummy data 전송
         try {

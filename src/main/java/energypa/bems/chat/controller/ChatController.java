@@ -25,7 +25,7 @@ import java.util.List;
 public class ChatController {
 
     private final ChatService chatService;
-    private final SimpMessageSendingOperations messagingTemplate;
+//    private final SimpMessageSendingOperations messagingTemplate;
 
     @Operation(summary = "채팅방 생성 요청", description = "유저가 입력한 이름을 가진 채팅방 생성")
     @ApiResponses({
@@ -76,7 +76,7 @@ public class ChatController {
                     content = @Content(mediaType = "application/json")
             )
     })
-    @PostMapping
+    @GetMapping("/temp")
     public ChatRoom createChatRoom(@RequestParam("roomName") String roomName) {
         return null;
     }
@@ -90,6 +90,6 @@ public class ChatController {
         } else if (chatMessage.getType().equals(MessageType.QUIT)) {
             chatMessage.setContent(chatMessage.getSender() + "님이 퇴장하셨습니다.");
         }
-        messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getRoomId(), chatMessage);
+//        messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getRoomId(), chatMessage);
     }
 }

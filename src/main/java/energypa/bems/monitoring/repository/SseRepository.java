@@ -1,27 +1,33 @@
 package energypa.bems.monitoring.repository;
 
+import energypa.bems.login.config.security.token.CurrentUser;
+import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.login.domain.Member;
+import energypa.bems.login.repository.MemberRepository;
 import energypa.bems.monitoring.dto.FloorInfo;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+@RequiredArgsConstructor
 @Getter
 @Repository
 public class SseRepository {
 
     private final Map<SseEmitter, FloorInfo> sseEmitterFloorMap = new ConcurrentHashMap();
     private final Map<Long, SseEmitter> sseEmitterBuildingMap = new ConcurrentHashMap();
+    private final MemberRepository memberRepository;
 
-    private Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    private Member member = ((Member) authentication.getPrincipal());
+    public void saveForFloor(SseEmitter sseEmitter, int building, int floor, @CurrentUser UserPrincipal userPrincipal) {
 
-    public void saveForFloor(SseEmitter sseEmitter, int building, int floor) {
+        Member member = memberRepository.findById(userPrincipal.getId()).get();
 
         FloorInfo myFloorInfo = FloorInfo.builder()
                 .authority(member.getAuthority())
@@ -46,6 +52,9 @@ public class SseRepository {
     }
 
     public void saveForBuilding(SseEmitter sseEmitter) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = ((Member) authentication.getPrincipal());
 
         Long myId = member.getId();
 

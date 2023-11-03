@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChatMessageRepository  extends JpaRepository<ChatMessage, Long> {
 
-    ChatMessage findByMessageId(Long messageId);
-    ChatMessage save(ChatMessage chatMessage);
+//    ChatMessage findByMessageId(Long messageId);
+//    ChatMessage save(ChatMessage chatMessage);
 }

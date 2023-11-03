@@ -1,6 +1,8 @@
 package energypa.bems.monitoring.controller;
 
 import energypa.bems.energy.domain.BuildingPerTenMinute;
+import energypa.bems.login.config.security.token.CurrentUser;
+import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.monitoring.dto.MonitorBuildingResponse;
 import energypa.bems.monitoring.service.MonitoringService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,11 +41,12 @@ public class MonitoringController {
     @GetMapping(value = "/floor", produces = "text/event-stream")
     public SseEmitter monitorByFloor(
             @RequestParam(value = "building") Integer building,
-            @RequestParam(value = "floor") Integer floor)
+            @RequestParam(value = "floor") Integer floor,
+            @CurrentUser UserPrincipal userPrincipal)
     {
 
         // 클라이언트-서버 간 SSE 연결
-        SseEmitter sseEmitter = monitoringService.formSseConnectionForFloor(building, floor);
+        SseEmitter sseEmitter = monitoringService.formSseConnectionForFloor(building, floor, userPrincipal);
 
         // prev monitoring floor info 전송
         List<BuildingPerTenMinute> prevFloorInfo = monitoringService.getPrevFloorInfo(building, floor);
