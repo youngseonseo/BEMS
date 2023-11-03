@@ -15,12 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class SseRepository {
 
-    private final Map<SseEmitter, FloorInfo> sseEmitterMap = new ConcurrentHashMap();
+    private final Map<SseEmitter, FloorInfo> sseEmitterFloorMap = new ConcurrentHashMap();
+    private final Map<Long, SseEmitter> sseEmitterBuildingMap = new ConcurrentHashMap();
 
-    public void save(SseEmitter sseEmitter, int building, int floor) {
+    private Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    private Member member = ((Member) authentication.getPrincipal());
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Member member = ((Member) authentication.getPrincipal());
+    public void saveForFloor(SseEmitter sseEmitter, int building, int floor) {
 
         FloorInfo myFloorInfo = FloorInfo.builder()
                 .authority(member.getAuthority())
@@ -28,12 +29,12 @@ public class SseRepository {
                 .floor(floor)
                 .build();
 
-        sseEmitterMap.values().stream().forEach(floorInfo -> {
+        sseEmitterFloorMap.values().stream().forEach(floorInfo -> {
             if (floorInfo.equals(myFloorInfo)) { // 클라이언트가 모니터링 페이지에 재방문한 경우
                 return;
             }
         });
-        sseEmitterMap.put(sseEmitter, myFloorInfo);
+        sseEmitterFloorMap.put(sseEmitter, myFloorInfo);
 
 //        sseEmitter.onCompletion(() -> {
 //            sseEmitterList.remove(sseEmitter);
@@ -42,5 +43,17 @@ public class SseRepository {
 //        sseEmitter.onTimeout(() -> {
 //            sseEmitter.complete();
 //        });
+    }
+
+    public void saveForBuilding(SseEmitter sseEmitter) {
+
+        Long myId = member.getId();
+
+        sseEmitterBuildingMap.keySet().stream().forEach(id -> {
+            if (id == myId) { // 클라이언트가 모니터링 페이지에 재방문한 경우
+                return;
+            }
+        });
+        sseEmitterBuildingMap.put(myId, sseEmitter);
     }
 }

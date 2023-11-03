@@ -1,8 +1,10 @@
 package energypa.bems.monitoring.scheduling;
 
 import energypa.bems.energy.domain.BuildingPerTenMinute;
+import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
 import energypa.bems.monitoring.dto.FloorInfo;
+import energypa.bems.monitoring.dto.TotalConsumption;
 import energypa.bems.monitoring.repository.SseRepository;
 import energypa.bems.monitoring.service.MonitoringService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +25,12 @@ public class Scheduling {
     private final MonitoringService monitoringService;
     private final SseRepository sseRepository;
     private final BuildingPerTenMinuteRepository floorRepository;
+    private final BuildingPerMinuteRepository buildingRepository;
 
     @Scheduled(cron = "0 0,10,20,30,40,50 * * * *")
     public void scheduleEvery10Min() {
 
-        Map<SseEmitter, FloorInfo> sseEmitterMap = sseRepository.getSseEmitterMap();
+        Map<SseEmitter, FloorInfo> sseEmitterMap = sseRepository.getSseEmitterFloorMap();
         Timestamp now = Timestamp.valueOf(monitoringService.manipulateNowWithSetSec0());
 
         sseEmitterMap.keySet().stream().forEach((sseEmitter -> {
@@ -44,6 +47,29 @@ public class Scheduling {
                     sseEmitter.send(SseEmitter.event()
                             .name("currentFloorConsumption")
                             .data(currentFloorConsumption));
+                } catch (IOException e) {
+                    log.error("", e);
+                }
+            }
+        }));
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    public void scheduleEveryMin() {
+
+        Map<Long, SseEmitter> sseEmitterMap = sseRepository.getSseEmitterBuildingMap();
+        Timestamp now = Timestamp.valueOf(monitoringService.manipulateNowWithSetSec0());
+
+        sseEmitterMap.values().stream().forEach((sseEmitter -> {
+
+            TotalConsumption currentTotalConsumption = buildingRepository.getBuildingConsumption(now);
+
+            if (currentTotalConsumption != null) {
+
+                try {
+                    sseEmitter.send(SseEmitter.event()
+                            .name("currentBuildingTotalConsumption")
+                            .data(currentTotalConsumption));
                 } catch (IOException e) {
                     log.error("", e);
                 }

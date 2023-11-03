@@ -1,6 +1,7 @@
 package energypa.bems.monitoring.controller;
 
 import energypa.bems.energy.domain.BuildingPerTenMinute;
+import energypa.bems.monitoring.dto.MonitorBuildingResponse;
 import energypa.bems.monitoring.service.MonitoringService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -42,7 +43,7 @@ public class MonitoringController {
     {
 
         // 클라이언트-서버 간 SSE 연결
-        SseEmitter sseEmitter = monitoringService.formSseConnection(building, floor);
+        SseEmitter sseEmitter = monitoringService.formSseConnectionForFloor(building, floor);
 
         // prev monitoring floor info 전송
         List<BuildingPerTenMinute> prevFloorInfo = monitoringService.getPrevFloorInfo(building, floor);
@@ -55,6 +56,38 @@ public class MonitoringController {
         }
 
         // 10분 주기로 데이터를 서버 -> 클라이언트 전송
+
+        return sseEmitter;
+    }
+
+    @Operation(summary = "동 별 모니터링 요청", description = "동 별 전력 사용량 및 예측량 모니터링 요청")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "모니터링 성공",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MonitorBuildingResponse.class))
+            )
+    })
+    @ResponseBody
+    @GetMapping(value = "/building", produces = "text/event-stream")
+    public SseEmitter monitorByBuilding(
+            @RequestParam("duration") String duration)
+    {
+
+        // 클라이언트-서버 간 SSE 연결
+        SseEmitter sseEmitter = monitoringService.formSseConnectionForBuilding();
+
+        // prev monitoring building info 전송
+        MonitorBuildingResponse prevBuildingInfo = monitoringService.getPrevBuildingInfo(duration);
+        try {
+            sseEmitter.send(SseEmitter.event()
+                    .name("sendPrevBuildingInfo")
+                    .data(prevBuildingInfo));
+        } catch (IOException e) {
+            log.error("", e);
+        }
+
+        // 1분 주기로 데이터를 서버 -> 클라이언트 전송
 
         return sseEmitter;
     }

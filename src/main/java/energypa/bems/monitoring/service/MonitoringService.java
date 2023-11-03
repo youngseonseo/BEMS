@@ -1,7 +1,11 @@
 package energypa.bems.monitoring.service;
 
 import energypa.bems.energy.domain.BuildingPerTenMinute;
+import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
+import energypa.bems.monitoring.dto.EachConsumption;
+import energypa.bems.monitoring.dto.MonitorBuildingResponse;
+import energypa.bems.monitoring.dto.TotalConsumption;
 import energypa.bems.monitoring.repository.SseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +23,16 @@ import java.util.List;
 public class MonitoringService {
 
     private final BuildingPerTenMinuteRepository floorRepository;
+    private final BuildingPerMinuteRepository buildingRepository;
     private final SseRepository sseRepository;
 
-    public SseEmitter formSseConnection(int building, int floor) {
+    public SseEmitter formSseConnectionForFloor(int building, int floor) {
 
         // sse 연결
         SseEmitter sseEmitter = new SseEmitter();
 
         // 생성한 SseEmitter 객체 저장
-        sseRepository.save(sseEmitter, building, floor);
+        sseRepository.saveForFloor(sseEmitter, building, floor);
 
         // sse 연결 후 dummy data 전송
         try {
@@ -41,7 +46,7 @@ public class MonitoringService {
         return sseEmitter;
     }
 
-    public LocalDateTime manipulateNow() {
+    public LocalDateTime manipulateNowForFloor() {
 
         LocalDateTime now = LocalDateTime.now();
         return now.minusMonths(7L);
@@ -49,12 +54,63 @@ public class MonitoringService {
 
     public LocalDateTime manipulateNowWithSetSec0() {
 
-        return manipulateNow().withSecond(0).withNano(0);
+        return manipulateNowForFloor().withSecond(0).withNano(0);
     }
 
     public List<BuildingPerTenMinute> getPrevFloorInfo(int building, int floor) {
 
-        Timestamp now = Timestamp.valueOf(manipulateNow());
+        Timestamp now = Timestamp.valueOf(manipulateNowForFloor());
         return floorRepository.getPrevFloorConsumption(building, floor, now);
+    }
+
+    public SseEmitter formSseConnectionForBuilding() {
+
+        // sse 연결
+        SseEmitter sseEmitter = new SseEmitter();
+
+        // 생성한 SseEmitter 객체 저장
+        sseRepository.saveForBuilding(sseEmitter);
+
+        // sse 연결 후 dummy data 전송
+        try {
+            sseEmitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data("dummy data to prevent 503"));
+        } catch (IOException e) {
+            log.error("", e);
+        }
+
+        return sseEmitter;
+    }
+
+    public LocalDateTime manipulateNowForBuilding() {
+
+        LocalDateTime now = LocalDateTime.now();
+        now = now.minusYears(1L);
+        return now.minusMonths(3L);
+    }
+
+    public String getYesterday() {
+        LocalDateTime todayDate = manipulateNowForBuilding();
+        return todayDate.minusDays(1L).toString();
+    }
+
+    public MonitorBuildingResponse getPrevBuildingInfo(String duration) {
+
+        Timestamp now = Timestamp.valueOf(manipulateNowForBuilding());
+        List<TotalConsumption> graph1 = buildingRepository.getPrevBuildingConsumption(now);
+
+        MonitorBuildingResponse monitorBuildingResponse = null;
+        if (duration.equals("date")) {
+            EachConsumption graph2 = buildingRepository.getYesterdayConsumption(getYesterday());
+            List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getYesterday());
+
+            monitorBuildingResponse = MonitorBuildingResponse.builder()
+                    .graph1(graph1)
+                    .graph2(graph2)
+                    .graph3(graph3)
+                    .build();
+        }
+        return monitorBuildingResponse;
     }
 }
