@@ -98,6 +98,12 @@ public class MonitoringService {
         return todayDate.minusDays(1L).toString();
     }
 
+    public String getLastWeek() {
+        LocalDateTime todayDate = manipulateNowForBuilding();
+        int yoilNum = todayDate.getDayOfWeek().getValue();
+        return todayDate.minusDays(yoilNum).toString();
+    }
+
     public String getLastMonth() {
         LocalDateTime todayDate = manipulateNowForBuilding();
         todayDate = todayDate.minusMonths(1L);
@@ -120,6 +126,13 @@ public class MonitoringService {
                     .graph2(graph2)
                     .graph3(graph3)
                     .build();
+        }
+        else if (duration.equals("week")) {
+            EachConsumption graph2 = buildingRepository.getLastWeekConsumption(getLastWeek());
+            monitorBuildingResponse.setGraph2(graph2);
+
+            List<EachConsumption> graph3 = buildingRepository.getWeeklyConsumption(getLastWeek());
+            monitorBuildingResponse.setGraph3(graph3);
         }
         else if (duration.equals("month")) {
             EachConsumption graph2 = buildingRepository.getLastMonthConsumption(getLastMonth());
