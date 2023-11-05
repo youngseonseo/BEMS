@@ -74,11 +74,11 @@ public class MonitoringController {
     @ResponseBody
     @GetMapping(value = "/building", produces = "text/event-stream")
     public SseEmitter monitorByBuilding(
-            @RequestParam("duration") String duration)
+            @RequestParam("duration") String duration,
+            @CurrentUser UserPrincipal userPrincipal)
     {
-
         // 클라이언트-서버 간 SSE 연결
-        SseEmitter sseEmitter = monitoringService.formSseConnectionForBuilding();
+        SseEmitter sseEmitter = monitoringService.formSseConnectionForBuilding(userPrincipal);
 
         // prev monitoring building info 전송
         MonitorBuildingResponse prevBuildingInfo = monitoringService.getPrevBuildingInfo(duration);

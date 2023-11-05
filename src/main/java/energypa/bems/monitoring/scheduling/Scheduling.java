@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -62,7 +63,10 @@ public class Scheduling {
 
         sseEmitterMap.values().stream().forEach((sseEmitter -> {
 
-            TotalConsumption currentTotalConsumption = buildingRepository.getBuildingConsumption(now);
+            TotalConsumption currentTotalConsumption = buildingRepository.getBuildingConsumption(now).stream()
+                    .map(row -> new TotalConsumption((Timestamp) row[0], (Double) row[1]))
+                    .collect(Collectors.toList())
+                    .get(0);
 
             if (currentTotalConsumption != null) {
 

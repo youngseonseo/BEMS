@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -66,13 +68,13 @@ public class MonitoringService {
         return floorRepository.getPrevFloorConsumption(building, floor, now);
     }
 
-    public SseEmitter formSseConnectionForBuilding() {
+    public SseEmitter formSseConnectionForBuilding(@CurrentUser UserPrincipal userPrincipal) {
 
         // sse 연결
         SseEmitter sseEmitter = new SseEmitter();
 
         // 생성한 SseEmitter 객체 저장
-        sseRepository.saveForBuilding(sseEmitter);
+        sseRepository.saveForBuilding(sseEmitter, userPrincipal);
 
         // sse 연결 후 dummy data 전송
         try {
@@ -95,13 +97,13 @@ public class MonitoringService {
 
     public String getYesterday() {
         LocalDateTime todayDate = manipulateNowForBuilding();
-        return todayDate.minusDays(1L).toString();
+        return todayDate.toLocalDate().minusDays(1L).toString();
     }
 
     public String getLastWeek() {
         LocalDateTime todayDate = manipulateNowForBuilding();
         int yoilNum = todayDate.getDayOfWeek().getValue();
-        return todayDate.minusDays(yoilNum).toString();
+        return todayDate.toLocalDate().minusDays(yoilNum).toString();
     }
 
     public String getLastMonth() {
@@ -114,12 +116,22 @@ public class MonitoringService {
     public MonitorBuildingResponse getPrevBuildingInfo(String duration) {
 
         Timestamp now = Timestamp.valueOf(manipulateNowForBuilding());
-        List<TotalConsumption> graph1 = buildingRepository.getPrevBuildingConsumption(now);
+
+        List<TotalConsumption> graph1 = buildingRepository.getPrevBuildingConsumption(now).stream()
+                .map(row -> new TotalConsumption((Timestamp) row[0], (Double) row[1]))
+                .collect(Collectors.toList());
 
         MonitorBuildingResponse monitorBuildingResponse = null;
         if (duration.equals("date")) {
-            EachConsumption graph2 = buildingRepository.getYesterdayConsumption(getYesterday());
-            List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getYesterday());
+
+            EachConsumption graph2 = buildingRepository.getYesterdayConsumption(getYesterday()).stream()
+                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .collect(Collectors.toList())
+                    .get(0);
+
+            List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getYesterday()).stream()
+                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .collect(Collectors.toList());
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()
                     .graph1(graph1)
@@ -128,15 +140,32 @@ public class MonitoringService {
                     .build();
         }
         else if (duration.equals("week")) {
-            EachConsumption graph2 = buildingRepository.getLastWeekConsumption(getLastWeek());
-            monitorBuildingResponse.setGraph2(graph2);
 
-            List<EachConsumption> graph3 = buildingRepository.getWeeklyConsumption(getLastWeek());
-            monitorBuildingResponse.setGraph3(graph3);
+            EachConsumption graph2 = buildingRepository.getLastWeekConsumption(getLastWeek()).stream()
+                    .map(row ->  new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .collect(Collectors.toList())
+                    .get(0);
+
+            List<EachConsumption> graph3 = buildingRepository.getWeeklyConsumption(getLastWeek()).stream()
+                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .collect(Collectors.toList());
+
+            monitorBuildingResponse = MonitorBuildingResponse.builder()
+                    .graph1(graph1)
+                    .graph2(graph2)
+                    .graph3(graph3)
+                    .build();
         }
         else if (duration.equals("month")) {
-            EachConsumption graph2 = buildingRepository.getLastMonthConsumption(getLastMonth());
-            List<EachConsumption> graph3 = buildingRepository.getMonthlyConsumption(getLastMonth());
+
+            EachConsumption graph2 = buildingRepository.getLastMonthConsumption(getLastMonth()).stream()
+                    .map(row ->  new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .collect(Collectors.toList())
+                    .get(0);
+
+            List<EachConsumption> graph3 = buildingRepository.getMonthlyConsumption(getLastMonth()).stream()
+                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .collect(Collectors.toList());
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()
                     .graph1(graph1)

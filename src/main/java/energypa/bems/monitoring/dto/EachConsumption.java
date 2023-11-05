@@ -1,13 +1,15 @@
 package energypa.bems.monitoring.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 
-import java.time.LocalDate;
+import java.sql.Date;
 
+@AllArgsConstructor
 public class EachConsumption {
 
     @Schema(description = "yesterday or week before or month before", example = "2022-08-03")
-    public LocalDate date;
+    public Date date;
 
     @Schema(description = "power consumption of 561", example = "87094.06345000003")
     public Double totalAConsumption;

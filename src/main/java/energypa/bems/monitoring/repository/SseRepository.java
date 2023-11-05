@@ -7,13 +7,10 @@ import energypa.bems.login.repository.MemberRepository;
 import energypa.bems.monitoring.dto.FloorInfo;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
@@ -51,11 +48,9 @@ public class SseRepository {
 //        });
     }
 
-    public void saveForBuilding(SseEmitter sseEmitter) {
+    public void saveForBuilding(SseEmitter sseEmitter, @CurrentUser UserPrincipal userPrincipal) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Member member = ((Member) authentication.getPrincipal());
-
+        Member member = memberRepository.findById(userPrincipal.getId()).get();
         Long myId = member.getId();
 
         sseEmitterBuildingMap.keySet().stream().forEach(id -> {
