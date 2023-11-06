@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Header, UserInfo, UserImg, SmallButton } from "./headerStyle";
 import { EventSourcePolyfill } from "event-source-polyfill";
+
 export default function MainHeader() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState([]);
@@ -27,7 +28,7 @@ export default function MainHeader() {
       .catch((err) => {
         //accesstoken 접근 불가 => refresh 토큰으로 갱신 필요
         console.log("cant access by access token", err);
-
+        getRefresh();
         return;
       });
   };
@@ -58,30 +59,8 @@ export default function MainHeader() {
       });
   };
 
-  const SSE = () => {
-    const subscribeUrl = "http://localhost:8080/api/sub";
-    if (localStorage.getItem("accessToken") != null) {
-      let token = localStorage.getItem("accessToken");
-      let eventSource = new EventSourcePolyfill(subscribeUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      eventSource.addEventListener("addComment", function (event) {
-        let message = event.data;
-        alert(message);
-      });
-
-      eventSource.addEventListener("error", function (event) {
-        eventSource.close();
-      });
-    }
-  };
-
   useEffect(() => {
     getUserInfo();
-    //SSE();
   }, []);
 
   const name = userInfo?.username;

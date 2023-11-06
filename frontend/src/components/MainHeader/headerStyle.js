@@ -6,7 +6,7 @@ export const Header = styled.div`
   align-items: center;
   color: white;
   background-color: black;
-  height: 55px;
+  height: 10vh;
   padding: 0px 70px;
 `;
 export const UserImg = styled.img`
