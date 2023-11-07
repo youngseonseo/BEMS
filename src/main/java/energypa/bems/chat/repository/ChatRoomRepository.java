@@ -2,13 +2,10 @@ package energypa.bems.chat.repository;
 
 import energypa.bems.chat.entity.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
 
-public interface ChatRoomRepository  extends JpaRepository<ChatRoom, String> {
-
-//    ChatRoom findByRoomId(String roomId);
-//    List<ChatRoom> findByRoomName(String roomName);
-//    ChatRoom save(ChatRoom chatRoom);
-//    void delete(String roomId);
+    @Query("select count(cr) from ChatRoom cr")
+    int getNumOfChatRoom();
 }
