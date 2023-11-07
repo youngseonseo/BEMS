@@ -77,7 +77,7 @@ public class NotificationController {
 
     @Operation(method="get", summary = "SSE 알림 기능 구독하는 API")
     @CrossOrigin
-    @GetMapping(value = "/sub",  produces=MediaType.TEXT_EVENT_STREAM_VALUE, consumes = MediaType.ALL_VALUE)
+    @GetMapping(value = "/sub",  produces="text/event-stream", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<SseEmitter> subscribe(@CurrentUser UserPrincipal user) {
 
         // 토큰에서 user의 pk값 파싱

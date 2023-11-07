@@ -4,16 +4,20 @@ import { BackGround } from "./../Monitoring/energy/EnergyStyle";
 import {
   DeleteButton,
   ManagerButton,
+  ButtonGroup,
   UserImg,
   SettingContainer,
   ImageChangeDiv,
   ImgButton,
+  CheckUserInfo,
+  InfoManager,
+  Managergroup,
 } from "./SettingStyle";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function SettingPage() {
-  const [userimg, setUserimg] = useState();
+  const [userInfo, setUserInfo] = useState([]);
   const applyManager = () => {
     const accessToken = localStorage.getItem("accessToken");
     axios({
@@ -33,6 +37,18 @@ export default function SettingPage() {
 
   const deleteMember = () => {
     const accessToken = localStorage.getItem("accessToken");
+    axios({
+      method: "delete",
+      url: "http://localhost:8080/api/auth/",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((res) => {
+        console.log(res);
+        alert("회원삭제");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const changeImage = () => {};
@@ -46,8 +62,8 @@ export default function SettingPage() {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .then((res) => {
-        console.log("in getUserImage in SEtting pagge", res);
-        setUserimg(res.data.information.imageUrl);
+        console.log("in getUserImage in Setting pagge", res);
+        setUserInfo(res.data.information);
       })
       .catch((err) => {
         console.log(err);
@@ -57,6 +73,7 @@ export default function SettingPage() {
   useEffect(() => {
     getUserImage();
   }, []);
+
   return (
     <div>
       <MainHeader />
@@ -65,19 +82,34 @@ export default function SettingPage() {
         <SettingContainer>
           <ImageChangeDiv>
             <UserImg
-              src={userimg}
+              src={userInfo?.imageUrl}
               width="200px"
               height="200px"
               alt="userImageSetting"
             />
-            <ImgButton>프로필 이미지 변경하기</ImgButton>
+            <ImgButton>프로필 이미지 변경</ImgButton>
           </ImageChangeDiv>
-          <div>유저 정보 확인하기</div>
-          <ManagerButton onClick={applyManager}>
-            건물 관리자 신청하기
-          </ManagerButton>
+          <CheckUserInfo>
+            <div>이름 : {userInfo?.username}</div>
+            <div>권한 : {userInfo?.authority}</div>
+            <div>이메일 : {userInfo?.email}</div>
+            <div> 동 : {userInfo?.building}</div>
+            <div>호수 : {userInfo?.floor}</div>
+          </CheckUserInfo>
+          <ButtonGroup>
+            <Managergroup>
+              <ManagerButton onClick={applyManager}>
+                건물 관리자 신청
+              </ManagerButton>
+              <InfoManager>
+                건물 관리자일 경우 신청하기 버튼을 눌러주세요. 확인 후 7일 이내
+                승인됩니다.
+              </InfoManager>
+            </Managergroup>
+
+            <DeleteButton>회원 탈퇴</DeleteButton>
+          </ButtonGroup>
         </SettingContainer>
-        <DeleteButton>회원 탈퇴하기</DeleteButton>
       </BackGround>
     </div>
   );

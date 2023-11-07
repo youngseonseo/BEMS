@@ -1,34 +1,38 @@
 import styled from "styled-components";
 
 export const DeleteButton = styled.button`
-  font-size: 15px;
-  color: white;
-  background-color: #3c4859;
+  background-color: #ffffff;
+  opacity: 30%;
   width: 180px;
-  height: 40px;
+  height: 45px;
   border: 3px;
   border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
   &:hover {
     border: 3px solid gray;
   }
+`;
+
+export const Managergroup = styled.div`
+  width: 300px;
+  display: grid;
+  gap: 10px;
 `;
 
 export const ManagerButton = styled.button`
-  font-size: 15px;
-  background-color: #2d65ba;
-  color: white;
-  width: 180px;
-  height: 40px;
+  background-color: #ffffff;
+  opacity: 80%;
+  width: 250px;
+  height: 45px;
   border: 3px;
   border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  font-size: 15px;
   &:hover {
     border: 3px solid gray;
   }
-`;
-
-export const ButtonGroup = styled.div`
-  display: flex;
-  gap: 20px;
 `;
 
 export const UserImg = styled.img`
@@ -39,7 +43,9 @@ export const UserImg = styled.img`
 
 export const SettingContainer = styled.div`
   display: flex;
-  gap: 20px;
+  width: 100vw;
+  gap: 40px;
+  justify-content: space-around;
 `;
 
 export const ImageChangeDiv = styled.div`
@@ -47,6 +53,7 @@ export const ImageChangeDiv = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  padding: 0px 20px;
 `;
 
 export const ImgButton = styled.button`
@@ -55,8 +62,37 @@ export const ImgButton = styled.button`
   background-color: gray;
   border-radius: 10px;
   border: 3px;
+  font-weight: bold;
   font-size: 15px;
   &:hover {
     border: 3px solid white;
   }
+`;
+
+export const CheckUserInfo = styled.div`
+  width: 350px;
+  height: 200px;
+  color: white;
+
+  background-color: gray;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 10px 10px 10px 0px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+`;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: end;
+`;
+
+export const InfoManager = styled.div`
+  color: #e16b6b;
+  font-size: 13px;
 `;
