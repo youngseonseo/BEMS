@@ -8,6 +8,7 @@ import numpy as np
 from typing import Final
 from collections import deque
 
+
 class Network(tf.Model):
     def __init__(self, state_size: int, action_size: int, hidden_size: int
     ):
