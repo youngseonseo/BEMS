@@ -30,7 +30,7 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final MatchingRepository matchingRepository;
     private final ChatMessageRepository chatMsgRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
+//    private final SimpMessageSendingOperations messagingTemplate;
 
     public List<ChatMessage> enterChatRoom(@CurrentUser UserPrincipal userPrincipal) {
 
@@ -50,7 +50,7 @@ public class ChatService {
             chatRoomRepository.updateCount(chatRoom.getRoomId());
 
             String enterMsg = member.getUsername() + " 님이 방에 입장하였습니다";
-            messagingTemplate.convertAndSend("/sub/chatroom/" + chatRoom.getRoomId(), enterMsg);
+//            messagingTemplate.convertAndSend("/sub/chatroom/" + chatRoom.getRoomId(), enterMsg);
 
             ChatMessage chatMessage = ChatMessage.builder()
                     .chatRoom(chatRoom)
