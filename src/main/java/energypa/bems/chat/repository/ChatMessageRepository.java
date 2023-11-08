@@ -3,8 +3,9 @@ package energypa.bems.chat.repository;
 import energypa.bems.chat.entity.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChatMessageRepository  extends JpaRepository<ChatMessage, Long> {
+import java.util.List;
 
-//    ChatMessage findByMessageId(Long messageId);
-//    ChatMessage save(ChatMessage chatMessage);
+public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
+
+    List<ChatMessage> findByChatRoomRoomId(String roomId);
 }
