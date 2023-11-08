@@ -8,4 +8,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
 
     @Query("select count(cr) from ChatRoom cr")
     int getNumOfChatRoom();
+
+    @Query("select cr from ChatRoom cr")
+    ChatRoom findChatRoom();
 }
