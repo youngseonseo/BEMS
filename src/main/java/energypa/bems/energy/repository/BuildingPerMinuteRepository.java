@@ -26,13 +26,13 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     List<Object[]> getYesterdayConsumption(@Param("yesterday") String yesterday);
 
     @Query(
-            value = "select sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption), :date from BuildingPerMinute bpm where date(bpm.timestamp) between date_sub(:date, interval 6 day) and :date",
+            value = "select date(:date), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) between date_sub(:date, interval 6 day) and :date",
             nativeQuery = true
     )
     List<Object[]> getLastWeekConsumption(@Param("date") String date);
 
     @Query(
-            value = "select sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption), date_format(bpm.timestamp, '%Y-%m') from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') = :lastMonth",
+            value = "select date(date_format(bpm.timestamp, '%Y-%m')), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') = :lastMonth",
             nativeQuery = true
     )
     List<Object[]> getLastMonthConsumption(@Param("lastMonth") String lastMonth);
@@ -45,17 +45,19 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     List<Object[]> getPrevDailyConsumption(@Param("yesterday") String yesterday);
 
     @Query(
-            value = "select date_format(date_sub(timestamp, interval (dayofweek(timestamp)-7) DAY), '%Y-%m-%d') as end, " +
-                    "       sum(a_consumption), sum(b_consumption), sum(c_consumption) " +
-                    "from buildingperminute " +
-                    "where timestamp < :date " +
+            value = "select date(date_sub(timestamp, interval (dayofweek(timestamp)-7) DAY)) as end, " +
+                    "       sum(a_consumption), " +
+                    "       sum(b_consumption), " +
+                    "       sum(c_consumption) " +
+                    "from BuildingPerMinute " +
+                    "where timestamp < :lastWeek " +
                     "group by date_format(timestamp, '%Y%U')",
             nativeQuery = true
     )
-    List<Object[]> getWeeklyConsumption(@Param("date") String date);
+    List<Object[]> getWeeklyConsumption(@Param("lastWeek") String lastWeek);
 
     @Query(
-            value = "select sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption), date_format(bpm.timestamp, '%Y-%m') from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') <= :lastMonth group by date_format(bpm.timestamp, '%Y-%m')",
+            value = "select date(date_format(bpm.timestamp, '%Y-%m')), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') <= :lastMonth group by date_format(bpm.timestamp, '%Y-%m')",
             nativeQuery = true
     )
     List<Object[]> getMonthlyConsumption(@Param("lastMonth") String lastMonth);
