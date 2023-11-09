@@ -1,6 +1,5 @@
 package energypa.bems.energy.repository;
 
-import energypa.bems.energy.domain.Building;
 import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.ess.dto.BusDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +10,59 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMinute, Long> {
+
+    // graph1
+    @Query("select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where bpm.timestamp <= :now")
+    List<Object[]> getPrevBuildingConsumption(@Param("now") Timestamp now);
+
+    @Query("select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where bpm.timestamp=:timestamp")
+    List<Object[]> getBuildingConsumption(@Param("timestamp") Timestamp timestamp);
+
+    // graph2
+    @Query(
+            value = "select date(bpm.timestamp), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) = :yesterday",
+            nativeQuery = true
+    )
+    List<Object[]> getYesterdayConsumption(@Param("yesterday") String yesterday);
+
+    @Query(
+            value = "select date(:date), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) between date_sub(:date, interval 6 day) and :date",
+            nativeQuery = true
+    )
+    List<Object[]> getLastWeekConsumption(@Param("date") String date);
+
+    @Query(
+            value = "select date(date_format(bpm.timestamp, '%Y-%m')), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') = :lastMonth",
+            nativeQuery = true
+    )
+    List<Object[]> getLastMonthConsumption(@Param("lastMonth") String lastMonth);
+
+    // graph3
+    @Query(
+            value = "select date(bpm.timestamp), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) <= :yesterday group by date(bpm.timestamp)",
+            nativeQuery = true
+    )
+    List<Object[]> getPrevDailyConsumption(@Param("yesterday") String yesterday);
+
+    @Query(
+            value = "select date(date_sub(timestamp, interval (dayofweek(timestamp)-7) DAY)) as end, " +
+                    "       sum(a_consumption), " +
+                    "       sum(b_consumption), " +
+                    "       sum(c_consumption) " +
+                    "from BuildingPerMinute " +
+                    "where timestamp < :lastWeek " +
+                    "group by date_format(timestamp, '%Y%U')",
+            nativeQuery = true
+    )
+    List<Object[]> getWeeklyConsumption(@Param("lastWeek") String lastWeek);
+
+    @Query(
+            value = "select date(date_format(bpm.timestamp, '%Y-%m')), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') <= :lastMonth group by date_format(bpm.timestamp, '%Y-%m')",
+            nativeQuery = true
+    )
+    List<Object[]> getMonthlyConsumption(@Param("lastMonth") String lastMonth);
+
     @Query("select new energypa.bems.ess.dto.BusDto(m.A_bus, m.B_bus, m.C_bus) from BuildingPerMinute m " +
             "where m.timestamp>=:startDt and m.timestamp<=:endDt")
     List<BusDto> findA_bus(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt);
-
 }

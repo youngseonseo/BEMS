@@ -24,6 +24,8 @@ export default function SignupPage() {
   const [imgFile, setImgFile] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   );
+  const [dong, setDong] = useState();
+  const [ho, setHo] = useState();
 
   const onChangeName = (event) => {
     setName(event.target.value);
@@ -37,12 +39,20 @@ export default function SignupPage() {
   const onChangePasswordSame = (event) => {
     setPasswordSame(event.target.value);
   };
+  const onChangeDong = (e) => {
+    setDong(e.target.value);
+  };
+  const onChangeHo = (e) => {
+    setHo(e.target.value);
+  };
 
   const userData = {
     name: name,
     email: email,
     password: password,
     imageUrl: imgFile,
+    building: dong,
+    floor: ho,
   };
 
   const registerFetch = (event) => {
@@ -95,6 +105,24 @@ export default function SignupPage() {
         setImgFile(result);
       });
   };
+  const OptionsDong = [
+    { value: "", name: "동 선택" },
+    { value: "561", name: "561동" },
+    { value: "562", name: "562동" },
+    { value: "563", name: "563동" },
+  ];
+
+  const SelectBox = (props) => {
+    return (
+      <select onChange={onChangeDong}>
+        {props.options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    );
+  };
 
   return (
     <div>
@@ -144,7 +172,18 @@ export default function SignupPage() {
                 이미지 업로드
               </ImageButton>
             </InputBox>
-
+            <InputBox>
+              <SelectBox options={OptionsDong}>동 선택</SelectBox>
+              <select onChange={onChangeHo}>
+                <option>호 선택</option>
+                <option key={2} value={2}>
+                  1호
+                </option>
+                <option key={2} value={2}>
+                  2호
+                </option>
+              </select>
+            </InputBox>
             <BigButton>네이버로 로그인</BigButton>
             <BigButton>카카오로 로그인</BigButton>
             <BigButton>구글로 로그인</BigButton>
