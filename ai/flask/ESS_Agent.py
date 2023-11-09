@@ -56,20 +56,20 @@ class DQNAgent:
             self.MIDDLE_LOAD = 132.2
             self.HIGH_LOAD = 214.3
 
-            self.dqn = tf.saved_model.load("BEMS/ai/ESS/summer_ess/")
+            self.dqn = tf.saved_model.load("ai/ESS/summer_ess/")
 
         elif timestamp.month >= 9 and timestamp.month <= 10:
             self.LOW_LOAD = 79.3
             self.MIDDLE_LOAD = 101.8
             self.HIGH_LOAD = 132.5
 
-            self.dqn = tf.saved_model.load("BEMS/ai/ESS/fall_ess/")
+            self.dqn = tf.saved_model.load("ai/ESS/fall_ess/")
         else :
             self.LOW_LOAD = 79.3
             self.MIDDLE_LOAD = 101.8
             self.HIGH_LOAD = 132.5
 
-            self.dqn = tf.saved_model.load("BEMS/ai/ESS/fall_ess/")
+            self.dqn = tf.saved_model.load("ai/ESS/fall_ess/")
         
 
     def set_data(self, data):
@@ -104,17 +104,15 @@ class DQNAgent:
         #[soc, b_p]
         return next_state
 
-def get_ndiff(train):
-    kpss_diffs = pm.arima.ndiffs(train, alpha=0.05, test='kpss', max_d=6)
-    adf_diffs = pm.arima.ndiffs(train, alpha=0.05, test='adf', max_d=6)
-    return max(adf_diffs, kpss_diffs)
+
 
 # data begin at 2022-08-27 12:00:00
 
 arima_model = None
 call_cnt = 0
 
-total_data = pd.read_csv("BEMS\preprocessed_data\[AI]총_소비전력 2022-07-18 00.00.00 ~ 2022-10-14 17.59.00.csv").set_index("TIMESTAMP")
+# total_data = pd.read_csv("BEMS/preprocessed_data/[AI]총_소비전력 2022-07-18 00.00.00 ~ 2022-10-14 17.59.00.csv").set_index("TIMESTAMP")
+total_data = pd.read_csv("preprocessed_data/[AI]총_소비전력 2022-07-18 00.00.00 ~ 2022-10-14 17.59.00.csv").set_index("TIMESTAMP")
 
 best_window_size = 1200
 train_end_date = pd.Timestamp("2022-08-27 11:59:00")
@@ -122,14 +120,17 @@ train_begin_date = train_end_date - datetime.timedelta(minutes=best_window_size)
 
 
 def predict(call_time : pd.Timestamp, current_consumption):
+    global call_cnt, arima_model, total_data, train_end_date, train_begin_date
+
     call_cnt += 1
     if call_cnt % 100 == 0:
         arima_model = None
         train_begin_date += datetime.timedelta(minutes=100)
         train_end_date = call_time
 
+    
     if arima_model is None:
-        train = total_data.loc[train_begin_date : train_end_date]
+        train = total_data.loc[str(train_begin_date) : str(train_end_date)]
 
         arima_model = pm.auto_arima(train, d=get_ndiff(train), seasonal=False)
 
@@ -137,3 +138,8 @@ def predict(call_time : pd.Timestamp, current_consumption):
     arima_model.update(current_consumption)
 
     return forcasted_data
+
+def get_ndiff(train):
+    kpss_diffs = pm.arima.ndiffs(train, alpha=0.05, test='kpss', max_d=6)
+    adf_diffs = pm.arima.ndiffs(train, alpha=0.05, test='adf', max_d=6)
+    return max(adf_diffs, kpss_diffs)
