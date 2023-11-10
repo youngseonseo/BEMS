@@ -1,0 +1,6 @@
+flask
+flask_restx
+pandas
+numpy
+tensorflow
+pmdarima
