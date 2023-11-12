@@ -1,6 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras import optimizers, losses
-from tensorflow.keras import Model
 
 import pandas as pd
 import numpy as np
@@ -10,21 +8,6 @@ from typing import Final
 from collections import deque
 
 import pmdarima as pm
-
-# class Network(tf.Model):
-#     def __init__(self, state_size: int, action_size: int, hidden_size: int
-#     ):
-#         super(Network, self).__init__()
-        
-#         self.layer1 = tf.keras.layers.Dense(hidden_size, activation='relu')
-#         self.layer2 = tf.keras.layers.Dense(hidden_size, activation='relu')
-#         self.value = tf.keras.layers.Dense(action_size)
-
-#     def call(self, state):
-#         layer1 = self.layer1(state)
-#         layer2 = self.layer2(layer1)
-#         value = self.value(layer2)
-#         return value
     
 class DQNAgent:
     def __init__(
@@ -56,7 +39,7 @@ class DQNAgent:
             self.MIDDLE_LOAD = 132.2
             self.HIGH_LOAD = 214.3
 
-            self.dqn = tf.saved_model.load("ai/ESS/summer_ess/")
+            self.dqn = tf.saved_model.load("ai/ESS/summer_ess2/")
 
         elif timestamp.month >= 9 and timestamp.month <= 10:
             self.LOW_LOAD = 79.3
