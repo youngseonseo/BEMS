@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource, Api, Namespace, fields
 import pandas as pd
-import ESS_Agent 
+import Ess_agent 
 import datetime
 
 Ess_controller = Namespace(
@@ -9,7 +9,7 @@ Ess_controller = Namespace(
     description="ESS scheduling related APIs"
 )
 
-ess_fields = Ess_controller.model('ESS', {  
+ess_fields = Ess_controller.model('ESS_REQUEST', {  
     'TIMESTAMP': fields.DateTime(description='호출 시간대', required=True, example="2018-11-28 07:23:00"),
     'SOC': fields.Float(description='현재 배터리 충전 상태(%)', required=True, example="50.0"),
     'BATTERY_POWER': fields.Float(description='현재 배터리 파워(kWh)', required=True, example="0.0"),
@@ -34,17 +34,17 @@ ess_response_fields = Ess_controller.model('ESS_RESPONSE', {
 class EssOpitmalSchedule(Resource):
     @Ess_controller.expect(ess_fields)
     @Ess_controller.response(201, 'Success', ess_response_fields)
-    @Ess_controller.response(500, 'Failed')
+    @Ess_controller.response(500, 'Fail')
     def post(self):
         """최적의 배터리 스케줄링 결과를 제공합니다."""
 
         param = request.get_json()
         call_time = pd.Timestamp(param['TIMESTAMP'])
-        agent = ESS_Agent.DQNAgent(call_time)
+        agent = Ess_agent.DQNAgent(call_time)
 
         current_consumption = (param['561_CONSUMPTION(kW)'] + param['562_CONSUMPTION(kW)'] + param['563_CONSUMPTION(kW)']) / 60.0
 
-        predicted_data = ESS_Agent.predict(call_time, current_consumption)
+        predicted_data = Ess_agent.predict(call_time, current_consumption)
 
         state = [param['SOC'], param['BATTERY_POWER']]
         for i in range(agent.predict_len):
