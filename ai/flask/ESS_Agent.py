@@ -5,7 +5,6 @@ import numpy as np
 import datetime
 
 from typing import Final
-from collections import deque
 
 import pmdarima as pm
     
