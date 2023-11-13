@@ -70,7 +70,10 @@ public class ChatService {
             return chatMsgForSub;
 
         } else { // 유저가 채팅방에 재입장한 경우
-            return chatMsgRepository.findByChatRoomRoomId(chatRoom.getRoomId());
+            return chatMsgRepository.getPrevChatMsgs(
+                    chatRoom.getRoomId(),
+                    member.getUsername() + " 님이 방에 입장하였습니다"
+            );
         }
     }
 }
