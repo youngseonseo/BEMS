@@ -55,7 +55,7 @@ public class ChatService {
             ChatMessage chatMessage = ChatMessage.builder()
                     .chatRoom(chatRoom)
                     .type(MessageType.ENTER)
-                    .sender(member)
+                    .sender(null)
                     .content(enterMsg)
                     .sentTime(LocalDateTime.now().toString())
                     .build();
