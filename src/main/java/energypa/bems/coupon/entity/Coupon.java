@@ -39,4 +39,8 @@ public class Coupon {
     @Schema(description = "남은 쿠폰 사용 가능 일자", example = "100")
     @Column(name = "d_day")
     private Integer dDay;
+
+    @Schema(description = "쿠폰 사용 여부", example = "true")
+    @Column(name = "used_yn")
+    private Boolean usedYn;
 }

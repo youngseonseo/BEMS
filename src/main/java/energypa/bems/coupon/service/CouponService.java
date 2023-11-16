@@ -17,7 +17,7 @@ public class CouponService {
     private final CouponRepository couponRepository;
 
     public List<Coupon> getCoupons(Member member) {
-        return couponRepository.findByReceiver(member);
+        return couponRepository.findByReceiverAndUsedYn(member, false);
     }
 
     public int getNumOfCoupons() {
