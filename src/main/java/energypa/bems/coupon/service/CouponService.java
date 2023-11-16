@@ -20,7 +20,7 @@ public class CouponService {
         return couponRepository.findByReceiverAndUsedYn(member, false);
     }
 
-    public int getNumOfCoupons() {
-        return couponRepository.getNumOfCoupons();
+    public int getNumOfCoupons(Member member) {
+        return couponRepository.getNumOfCoupons(member,false);
     }
 }
