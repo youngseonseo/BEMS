@@ -1,9 +1,9 @@
 import NavigationBar from "../../../components/NavBar/navbar";
 import MainHeader from "../../../components/MainHeader/header";
-import { BackGround } from "./../energy/EnergyStyle";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
+  BackGround,
   BuildingLight,
   Buildingcontainer,
   BatteryImage,
@@ -54,9 +54,9 @@ export default function ElectricDistributionPage({
               height="150px"
               alt="battery"
             />
-            <OneBox></OneBox>
-            <TwoBox></TwoBox>
-            <ThreeBox></ThreeBox>
+            <OneBox open={isopened}></OneBox>
+            <TwoBox open={isopened}></TwoBox>
+            <ThreeBox open={isopened}></ThreeBox>
             <Building>
               <BoxLine1_a bus={busA}></BoxLine1_a>
               <BuildingLight bus={busA}>

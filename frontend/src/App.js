@@ -11,7 +11,10 @@ import CouponPage from "./pages/Coupon/Coupons";
 import SettingPage from "./pages/Setting/Setting";
 import ChattingPage from "./pages/Chatting/Chatting";
 import NorificationPage from "./pages/Notify/Notify";
+import FloorBillEnergyPage from "./pages/Monitoring/energy/Floor_energy/Floor_energy";
+import UserCouponPage from "./pages/Coupon/userCoupon/userCoupons";
 import { useEffect, useState } from "react";
+import UserSettingPage from "./pages/Setting/userSetting/userSetting";
 
 function App() {
   const [isopened, setOpen] = useState(false);
@@ -83,10 +86,13 @@ function App() {
           }
         />
 
-        <Route path="/main/coupon" element={<CouponPage />} />
+        <Route path="/main/user/bill" element={<FloorBillEnergyPage />} />
+        <Route path="/main/user/coupon" element={<UserCouponPage />} />
+        <Route path="/main/user/setting" element={<UserSettingPage />} />
         <Route path="/main/chatting" element={<ChattingPage />} />
         <Route path="/main/setting" element={<SettingPage />} />
         <Route path="/main/notify" element={<NorificationPage />} />
+        <Route path="/main/coupon" element={<CouponPage />} />
       </Routes>
     </Router>
   );
