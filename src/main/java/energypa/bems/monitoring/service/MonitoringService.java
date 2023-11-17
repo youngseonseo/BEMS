@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MonitoringService {
 
+    public static final long TIMEOUT = 60L * 10000;
     private final BuildingPerTenMinuteRepository floorRepository;
     private final BuildingPerMinuteRepository buildingRepository;
     private final SseRepository sseRepository;
@@ -54,12 +55,12 @@ public class MonitoringService {
     public LocalDateTime manipulateNowForFloor() {
 
         LocalDateTime now = LocalDateTime.now();
-        return now.minusMonths(7L);
+        return now.minusMonths(15L);
     }
 
     public LocalDateTime manipulateNowWithSetSec0() {
 
-        return manipulateNowForFloor().withSecond(0).withNano(0);
+        return manipulateNowForBuilding().withSecond(0).withNano(0);
     }
 
     public List<BuildingPerTenMinute> getPrevFloorInfo(int building, int floor) {
@@ -71,8 +72,7 @@ public class MonitoringService {
     public SseEmitter formSseConnectionForBuilding(@CurrentUser UserPrincipal userPrincipal) {
 
         // sse 연결
-        SseEmitter sseEmitter = new SseEmitter();
-
+        SseEmitter sseEmitter = new SseEmitter(TIMEOUT);
         // 생성한 SseEmitter 객체 저장
         sseRepository.saveForBuilding(sseEmitter, userPrincipal);
 
@@ -92,12 +92,17 @@ public class MonitoringService {
 
         LocalDateTime now = LocalDateTime.now();
         now = now.minusYears(1L);
-        return now.minusMonths(3L);
+        now = now.minusMonths(4L);
+        return now.plusDays(10L);
     }
 
     public String getYesterday() {
         LocalDateTime todayDate = manipulateNowForBuilding();
         return todayDate.toLocalDate().minusDays(1L).toString();
+    }
+    public String getOneWeekAgo() {
+        LocalDateTime todayDate = manipulateNowForBuilding();
+        return todayDate.toLocalDate().minusDays(7L).toString();
     }
 
     public String getLastWeek() {
@@ -116,21 +121,22 @@ public class MonitoringService {
     public MonitorBuildingResponse getPrevBuildingInfo(String duration) {
 
         Timestamp now = Timestamp.valueOf(manipulateNowForBuilding());
+        System.out.println("now = " + now);
 
         List<TotalConsumption> graph1 = buildingRepository.getPrevBuildingConsumption(now).stream()
-                .map(row -> new TotalConsumption((Timestamp) row[0], (Double) row[1]))
+                .map(row -> new TotalConsumption((Timestamp) row[0], (int)Math.round((Double) row[1])))
                 .collect(Collectors.toList());
 
         MonitorBuildingResponse monitorBuildingResponse = null;
         if (duration.equals("date")) {
-
+            System.out.println("getYesterday() = " + getYesterday());
             EachConsumption graph2 = buildingRepository.getYesterdayConsumption(getYesterday()).stream()
-                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .map(row -> new EachConsumption((Date) row[0], (int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList())
                     .get(0);
 
-            List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getYesterday()).stream()
-                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+            List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getOneWeekAgo(), getYesterday()).stream()
+                    .map(row -> new EachConsumption((Date) row[0], (int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList());
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()
@@ -142,12 +148,12 @@ public class MonitoringService {
         else if (duration.equals("week")) {
 
             EachConsumption graph2 = buildingRepository.getLastWeekConsumption(getLastWeek()).stream()
-                    .map(row ->  new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .map(row ->  new EachConsumption((Date) row[0],(int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList())
                     .get(0);
 
-            List<EachConsumption> graph3 = buildingRepository.getWeeklyConsumption(getLastWeek()).stream()
-                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+            List<EachConsumption> graph3 = buildingRepository.getWeeklyConsumption(getLastMonth(),getLastWeek()).stream()
+                    .map(row -> new EachConsumption((Date) row[0],(int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList());
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()
@@ -159,12 +165,12 @@ public class MonitoringService {
         else if (duration.equals("month")) {
 
             EachConsumption graph2 = buildingRepository.getLastMonthConsumption(getLastMonth()).stream()
-                    .map(row ->  new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .map(row ->  new EachConsumption((Date) row[0], (int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList())
                     .get(0);
 
             List<EachConsumption> graph3 = buildingRepository.getMonthlyConsumption(getLastMonth()).stream()
-                    .map(row -> new EachConsumption((Date) row[0], (Double) row[1], (Double) row[2], (Double) row[3]))
+                    .map(row -> new EachConsumption((Date) row[0], (int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList());
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()

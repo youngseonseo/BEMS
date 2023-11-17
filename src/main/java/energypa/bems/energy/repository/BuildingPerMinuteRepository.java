@@ -2,6 +2,8 @@ package energypa.bems.energy.repository;
 
 import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.ess.dto.BusDto;
+import energypa.bems.monitoring.dto.Graph1Dto;
+import energypa.bems.monitoring.dto.TotalConsumption;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,11 +14,14 @@ import java.util.List;
 public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMinute, Long> {
 
     // graph1
-    @Query("select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where bpm.timestamp <= :now")
+    @Query( value = "select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where date(bpm.timestamp) between date_sub(:now, interval 1 MONTH) and :now",
+            nativeQuery = true
+    )
     List<Object[]> getPrevBuildingConsumption(@Param("now") Timestamp now);
 
-    @Query("select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where bpm.timestamp=:timestamp")
-    List<Object[]> getBuildingConsumption(@Param("timestamp") Timestamp timestamp);
+    // 1분마다 보내지는 query
+    @Query("select (bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption) from BuildingPerMinute bpm where bpm.timestamp=:timestamp")
+    Double getBuildingConsumption(@Param("timestamp") Timestamp timestamp);
 
     // graph2
     @Query(
@@ -39,10 +44,10 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
 
     // graph3
     @Query(
-            value = "select date(bpm.timestamp), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) <= :yesterday group by date(bpm.timestamp)",
+            value = "select date(bpm.timestamp), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date(bpm.timestamp) >= :lastWeek and date(bpm.timestamp) <= :yesterday group by date(bpm.timestamp)",
             nativeQuery = true
     )
-    List<Object[]> getPrevDailyConsumption(@Param("yesterday") String yesterday);
+    List<Object[]> getPrevDailyConsumption(@Param("lastWeek") String lastWeek, @Param("yesterday") String yesterday);
 
     @Query(
             value = "select date(date_sub(timestamp, interval (dayofweek(timestamp)-7) DAY)) as end, " +
@@ -50,11 +55,11 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
                     "       sum(b_consumption), " +
                     "       sum(c_consumption) " +
                     "from BuildingPerMinute " +
-                    "where timestamp < :lastWeek " +
+                    "where timestamp < :lastWeek and timestamp > :lastMonth " +
                     "group by date_format(timestamp, '%Y%U')",
             nativeQuery = true
     )
-    List<Object[]> getWeeklyConsumption(@Param("lastWeek") String lastWeek);
+    List<Object[]> getWeeklyConsumption(@Param("lastMonth") String lastMonth, @Param("lastWeek") String lastWeek);
 
     @Query(
             value = "select date(date_format(bpm.timestamp, '%Y-%m')), sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption) from BuildingPerMinute bpm where date_format(bpm.timestamp, '%Y-%m') <= :lastMonth group by date_format(bpm.timestamp, '%Y-%m')",
@@ -65,4 +70,6 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     @Query("select new energypa.bems.ess.dto.BusDto(m.A_bus, m.B_bus, m.C_bus) from BuildingPerMinute m " +
             "where m.timestamp>=:startDt and m.timestamp<=:endDt")
     List<BusDto> findA_bus(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt);
+
+
 }
