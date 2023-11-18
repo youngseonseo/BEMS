@@ -52,7 +52,6 @@ class DQNAgent:
             self.HIGH_LOAD = 132.5
 
             self.dqn = tf.saved_model.load("ai/ESS/fall_ess/")
-        
 
     def set_data(self, data):
         self.data = data
