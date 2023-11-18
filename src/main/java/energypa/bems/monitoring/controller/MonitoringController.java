@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -72,7 +73,7 @@ public class MonitoringController {
             )
     })
     @ResponseBody
-    @GetMapping(value = "/building", produces = "text/event-stream")
+    @GetMapping(value = "/building", produces = "text/event-stream",consumes = MediaType.ALL_VALUE)
     public SseEmitter monitorByBuilding(
             @RequestParam("duration") String duration,
             @CurrentUser UserPrincipal userPrincipal)

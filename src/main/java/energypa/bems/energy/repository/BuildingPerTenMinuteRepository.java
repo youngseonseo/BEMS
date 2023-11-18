@@ -15,7 +15,10 @@ public interface BuildingPerTenMinuteRepository extends JpaRepository<BuildingPe
 
     BuildingPerTenMinute findByBuildingAndFloorAndTimestamp(int building, int floor, Timestamp now);
 
-    @Query(value = "select sum(consumption) from BuildingPerTenMinute m where m.timestamp " +
+    @Query(value = "select sum(consumption) from BuildingPerTenMinute m where m.timestamp " +                    // 층별 전력 소비량
             "between :startDt and :endDt and m.building =:building and m.floor =:floor", nativeQuery = true)
     Integer findConsumptionByTimestampAndBuildingAndFloor(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt, @Param("building") int building,  @Param("floor") int floor);
+
+
+
 }

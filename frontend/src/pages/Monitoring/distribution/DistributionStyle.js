@@ -1,5 +1,10 @@
 import styled from "styled-components";
-
+export const BackGround = styled.div`
+  background-color: #292929;
+  padding: 50px 50px;
+  display: flex;
+  height: 90vh;
+`;
 export const DistBack = styled.div`
   display: flex;
   flex-direction: column;
@@ -108,7 +113,8 @@ export const BoxLine2_c = styled.div`
 export const OneBox = styled.div`
   width: 10vw;
   height: 12vh;
-  border: 7px solid yellow;
+  border: ${(props) =>
+    props.open === true ? `7px solid yellow` : `7px solid black `};
   position: relative;
   z-index: 1;
   right: 10vw;
@@ -116,7 +122,8 @@ export const OneBox = styled.div`
 export const TwoBox = styled.div`
   width: 6vw;
   height: 12vh;
-  border-top: 7px solid yellow;
+  border-top: ${(props) =>
+    props.open === true ? `7px solid yellow` : `7px solid black `};
   position: relative;
   z-index: 1;
   top: 6vh;
@@ -125,7 +132,8 @@ export const TwoBox = styled.div`
 export const ThreeBox = styled.div`
   width: 0vw;
   height: 63vh;
-  border: 3.5px solid yellow;
+  border: ${(props) =>
+    props.open === true ? `3.5px solid yellow` : `3.5px solid black `};
   position: relative;
   z-index: 4;
   right: 14vw;

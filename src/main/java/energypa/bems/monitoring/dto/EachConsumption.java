@@ -11,12 +11,12 @@ public class EachConsumption {
     @Schema(description = "yesterday or week before or month before", example = "2022-08-03")
     public Date date;
 
-    @Schema(description = "power consumption of 561", example = "87094.06345000003")
-    public Double totalAConsumption;
+    @Schema(description = "power consumption of 561", example = "87094")
+    public Integer totalAConsumption;
 
-    @Schema(description = "power consumption of 562", example = "85759.40585000004")
-    public Double totalBConsumption;
+    @Schema(description = "power consumption of 562", example = "85759")
+    public Integer totalBConsumption;
 
-    @Schema(description = "power consumption of 563", example = "48706.65279999998")
-    public Double totalCConsumption;
+    @Schema(description = "power consumption of 563", example = "48706")
+    public Integer totalCConsumption;
 }

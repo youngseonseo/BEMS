@@ -1,6 +1,9 @@
-import NavigationBar from "../../components/NavBar/navbar";
-import MainHeader from "../../components/MainHeader/header";
-import { BackGround } from "./../Monitoring/distribution/DistributionStyle";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import UserNavigationBar from "../../../components/NavBar/userNavbar";
+import MainHeader from "../../../components/MainHeader/header";
+import { BackGround } from "../../Monitoring/distribution/DistributionStyle";
+
 import {
   DeleteButton,
   ManagerButton,
@@ -12,18 +15,17 @@ import {
   CheckUserInfo,
   InfoManager,
   Managergroup,
-} from "./SettingStyle";
-import axios from "axios";
-import { useEffect, useState } from "react";
+} from "./../SettingStyle";
 
-export default function SettingPage() {
+export default function UserSettingPage() {
   const [userInfo, setUserInfo] = useState([]);
+
   const applyManager = () => {
-    const accessToken = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     axios({
       method: "post",
       url: "http://localhost:8080/api/manager/apply",
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         console.log(res);
@@ -35,34 +37,34 @@ export default function SettingPage() {
       });
   };
 
-  const deleteMember = () => {
-    const accessToken = localStorage.getItem("accessToken");
-    axios({
-      method: "delete",
-      url: "http://localhost:8080/api/auth/",
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-      .then((res) => {
-        console.log(res);
-        alert("회원삭제");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const deleteMember = () => {
+  //   const accessToken = localStorage.getItem("accessToken");
+  //   axios({
+  //     method: "delete",
+  //     url: "http://localhost:8080/api/auth/",
+  //     headers: { Authorization: `Bearer ${accessToken}` },
+  //   })
+  //     .then((res) => {
+  //       console.log(res);
+  //       alert("회원삭제");
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
-  const changeImage = () => {};
+  //const changeImage = () => {};
 
-  const onChangePassword = () => {};
+  //const onChangePassword = () => {};
 
   const getUserImage = () => {
-    const accessToken = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     axios
       .get("http://localhost:8080/api/auth/", {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        console.log("in getUserImage in Setting pagge", res);
+        console.log("in getUserImage in UserSetting page", res);
         setUserInfo(res.data.information);
       })
       .catch((err) => {
@@ -78,7 +80,7 @@ export default function SettingPage() {
     <div>
       <MainHeader />
       <BackGround>
-        <NavigationBar name="setting" />
+        <UserNavigationBar name="setting" />
         <SettingContainer>
           <ImageChangeDiv>
             <UserImg

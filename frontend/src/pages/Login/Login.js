@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import StartHeader from "./../../components/Startheader/header";
 import {
   InputSign,
@@ -49,7 +50,29 @@ export default function LoginPage() {
           if (response.accessToken) {
             window.localStorage.setItem("accessToken", response.accessToken);
             window.localStorage.setItem("refreshToken", response.refreshToken);
-            navigate("/main/monitoring/energy_consumption");
+            const token = localStorage.getItem("accessToken");
+            axios
+              .get("http://localhost:8080/api/auth/", {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .then((res) => {
+                console.log(res);
+                const info = res.data.information;
+                return info;
+              })
+              .then((info) => {
+                console.log(info);
+                if (info.authority === "USER") {
+                  if (info.floor === 0) {
+                    alert("접근 불가능. 관리자로의 승인을 기다리는 중입니다.");
+                    navigate("/");
+                  } else {
+                    navigate("/main/user/bill");
+                  }
+                } else {
+                  navigate("/main/monitoring/energy_consumption");
+                }
+              });
           } else {
             alert(response.information.message);
           }

@@ -24,8 +24,9 @@ export default function SignupPage() {
   const [imgFile, setImgFile] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   );
-  const [dong, setDong] = useState();
-  const [ho, setHo] = useState();
+  const [dong, setDong] = useState("0");
+  const [ho, setHo] = useState("0");
+  const [auth, setAuth] = useState();
 
   const onChangeName = (event) => {
     setName(event.target.value);
@@ -44,6 +45,9 @@ export default function SignupPage() {
   };
   const onChangeHo = (e) => {
     setHo(e.target.value);
+  };
+  const onchnageAuthoriy = (e) => {
+    setAuth(e.target.value);
   };
 
   const userData = {
@@ -105,25 +109,25 @@ export default function SignupPage() {
         setImgFile(result);
       });
   };
-  const OptionsDong = [
-    { value: "", name: "동 선택" },
-    { value: "561", name: "561동" },
-    { value: "562", name: "562동" },
-    { value: "563", name: "563동" },
-  ];
+  // const OptionsDong = [
+  //   { value: "0", name: "동 선택" },
+  //   { value: "561", name: "561동" },
+  //   { value: "562", name: "562동" },
+  //   { value: "563", name: "563동" },
+  // ];
 
-  const SelectBox = (props) => {
-    return (
-      <select onChange={onChangeDong}>
-        {props.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.name}
-          </option>
-        ))}
-      </select>
-    );
-  };
-
+  // const SelectBox = (props) => {
+  //   return (
+  //     <select onChange={onChangeDong}>
+  //       {props.options.map((option) => (
+  //         <option key={option.value} value={option.value}>
+  //           {option.name}
+  //         </option>
+  //       ))}
+  //     </select>
+  //   );
+  // };
+  console.log(dong, ho);
   return (
     <div>
       <BackGround>
@@ -173,17 +177,45 @@ export default function SignupPage() {
               </ImageButton>
             </InputBox>
             <InputBox>
-              <SelectBox options={OptionsDong}>동 선택</SelectBox>
-              <select onChange={onChangeHo}>
-                <option>호 선택</option>
-                <option key={2} value={2}>
-                  1호
+              <select onChange={onchnageAuthoriy}>
+                <option key={"user"} value={"user"} selected>
+                  사용자
                 </option>
-                <option key={2} value={2}>
-                  2호
+                <option key={"manager"} value={"manager"}>
+                  관리자
                 </option>
               </select>
             </InputBox>
+
+            {auth === "manager" ? null : (
+              <InputBox>
+                <select onChange={onChangeDong}>
+                  <option selected>동 선택</option>
+                  <option key={561} value={561}>
+                    561동
+                  </option>
+                  <option key={562} value={562}>
+                    562동
+                  </option>
+                  <option key={563} value={563}>
+                    563동
+                  </option>
+                </select>
+                <select onChange={onChangeHo}>
+                  <option selected>호 선택</option>
+                  <option key={1} value={1}>
+                    1호
+                  </option>
+                  <option key={2} value={2}>
+                    2호
+                  </option>
+                  <option key={3} value={3}>
+                    3호
+                  </option>
+                </select>
+              </InputBox>
+            )}
+
             <BigButton>네이버로 로그인</BigButton>
             <BigButton>카카오로 로그인</BigButton>
             <BigButton>구글로 로그인</BigButton>
