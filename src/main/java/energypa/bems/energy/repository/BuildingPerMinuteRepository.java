@@ -67,9 +67,6 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     )
     List<Object[]> getMonthlyConsumption(@Param("lastMonth") String lastMonth);
 
-    @Query("select new energypa.bems.ess.dto.BusDto(m.A_bus, m.B_bus, m.C_bus) from BuildingPerMinute m " +
-            "where m.timestamp>=:startDt and m.timestamp<=:endDt")
-    List<BusDto> findA_bus(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt);
 
 
 }
