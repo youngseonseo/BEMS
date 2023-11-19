@@ -3,12 +3,18 @@ package energypa.bems.coupon.entity;
 import energypa.bems.login.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Schema(description = "쿠폰 info")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 public class Coupon {
 
@@ -30,11 +36,11 @@ public class Coupon {
 
     @Schema(description = "쿠폰 발급일", example = "")
     @Column(name = "issue_date")
-    private LocalDateTime issueDate;
+    private LocalDate issueDate;
 
     @Schema(description = "쿠폰 만료일", example = "")
     @Column(name = "expiration_date")
-    private LocalDateTime expirationDate;
+    private LocalDate expirationDate;
 
     @Schema(description = "남은 쿠폰 사용 가능 일자", example = "100")
     @Column(name = "d_day")
