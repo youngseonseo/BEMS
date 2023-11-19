@@ -1,13 +1,7 @@
 package energypa.bems.energy;
 
-import energypa.bems.energy.domain.Building;
-import energypa.bems.energy.domain.BuildingEnergyPrice;
-import energypa.bems.energy.domain.BuildingPerMinute;
-import energypa.bems.energy.domain.BuildingPerTenMinute;
-import energypa.bems.energy.repository.BuildingEnergyPriceRepository;
-import energypa.bems.energy.repository.BuildingPerMinuteRepository;
-import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
-import energypa.bems.energy.repository.BuildingRepository;
+import energypa.bems.energy.domain.*;
+import energypa.bems.energy.repository.*;
 import energypa.bems.energy.service.CsvReadService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -28,18 +22,25 @@ public class InitEnergyDB {
     private final BuildingPerTenMinuteRepository buildingPerTenMinuteRepository;
     private final BuildingPerMinuteRepository buildingPerMinuteRepository;
     private final BuildingEnergyPriceRepository buildingEnergyPriceRepository;
+    private final EssBatteryRepository essBatteryRepository;
     CsvReadService csvReadService = new CsvReadService();
 
 
-//    @PostConstruct
+    @PostConstruct
     public void init() {
 //
 //        buildingInit();
 //        log.info("building init completed!");
-        floorInit();
-        log.info("Floor init completed");
+
         buildingPerMinuteInit();
         log.info("buildingPerMinute init completed");
+
+        floorInit();
+        log.info("Floor init completed");
+
+        essInit();
+        log.info("ess init completed");
+
         buildingEnergyPriceInit();
         log.info("buildingEnergyPrice init completed");
 
@@ -64,7 +65,7 @@ public class InitEnergyDB {
         if(buildingPerTenMinuteRepository.findById(10000L).isPresent()){
             return;
         }
-        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[10분 단위]아파트_층별_소비전력_2023-03-16 06.30.00 ~ 2023-08-30 10.30.00.csv");
+        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[DB]아파트_층별_소비전력_2023-03-16 06.30.00 ~ 2023-08-30 10.30.00.csv");
         for (Map<String, Object> map : maps) {
 
             BuildingPerTenMinute buildingPerTenMinute = new BuildingPerTenMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")),Integer.valueOf((String) map.get("BUILDING")), Integer.valueOf((String)map.get("FLOOR")), Integer.valueOf((String) map.get("CONSUMPTION(W)")));
@@ -78,11 +79,28 @@ public class InitEnergyDB {
         if(buildingPerMinuteRepository.findById(10000L).isPresent()){
             return;
         }
-        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[1분 단위]아파트_동별_소비전력_전력분배_2022-07-18 00.00.00~2023-08-30 10.39.00.csv");
+        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[DB]아파트_동별_소비전력_2022-08-27 12.00.00~2022-10-14 17.59.00.csv");
         for (Map<String, Object> map : maps) {
 
-            BuildingPerMinute buildingPerMinute = new BuildingPerMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")), Integer.valueOf((String) map.get("561_bus")), Integer.valueOf((String)map.get("562_bus")), Integer.valueOf((String) map.get("563_bus")));
+            BuildingPerMinute buildingPerMinute = new BuildingPerMinute(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")));
             buildingPerMinuteRepository.save(buildingPerMinute);
+
+        }
+
+
+    }
+
+
+    public void essInit(){           // [1분 단위] 아파트_동별_소비전력_전력분배
+        if(essBatteryRepository.findById(10000L).isPresent()){
+            return;
+        }
+        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[DB]아파트_전력분배_2022-08-27 12.00.00~2022-10-14 17.59.00.csv");
+        for (Map<String, Object> map : maps) {
+
+
+            EssBattery essBattery = new EssBattery(Timestamp.valueOf((String) map.get("TIMESTAMP")), Integer.valueOf((String) map.get("561_BUS")), Integer.valueOf((String)map.get("562_BUS")), Integer.valueOf((String) map.get("563_BUS")));
+            essBatteryRepository.save(essBattery);
 
         }
 
