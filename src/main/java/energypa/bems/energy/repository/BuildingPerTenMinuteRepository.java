@@ -19,6 +19,13 @@ public interface BuildingPerTenMinuteRepository extends JpaRepository<BuildingPe
             "between :startDt and :endDt and m.building =:building and m.floor =:floor", nativeQuery = true)
     Integer findConsumptionByTimestampAndBuildingAndFloor(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt, @Param("building") int building,  @Param("floor") int floor);
 
+    @Query(
+            value = "select building, floor, sum(consumption) from BuildingPerTenMinute " +
+                    "where building = :building and floor = :floor and (year(timestamp) = :year and month(timestamp) = :month)",
+            nativeQuery = true
+    )
+    List<Object[]> getPowerUsageForASpecificMonth(@Param("building") int building, @Param("floor") int floor, @Param("year") int year, @Param("month") int month);
 
-
+    @Query("select count(bptm) from BuildingPerTenMinute bptm where bptm.building = :building and bptm.floor = :floor")
+    int getExistenceOfThatFloor(@Param("building") int building, @Param("floor") int floor);
 }
