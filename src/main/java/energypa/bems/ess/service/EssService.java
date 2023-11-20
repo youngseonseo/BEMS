@@ -22,7 +22,7 @@ public class EssService {
     private final EssBatteryRepository essBatteryRepository;
     private final MemberRepository memberRepository;
 
-    public void essMonitorService(@CurrentUser UserPrincipal userPrincipal) {
+    public void essMonitorService() {
 
         try {
 
@@ -31,21 +31,23 @@ public class EssService {
             Timestamp endDt = new Timestamp(now.getYear()-1,now.getMonth()-3,now.getDate()+15, now.getHours(),now.getMinutes(),now.getSeconds(), now.getNanos());
 
             List<BusDto> aBus = essBatteryRepository.findA_bus(startDt, endDt);
-            Member member = memberRepository.findById(userPrincipal.getId()).get();
 
             for (BusDto bus : aBus) {
-                if (sseEmitters.containsKey(member.getId())) {
-                    SseEmitter sseEmitter = sseEmitters.get(member.getId());
-                    if(sseEmitter!=null) {
-                        try {
-                            sseEmitter.send(SseEmitter.event().name("ess").data(bus));
-                            Thread.sleep(1000);
-                        } catch (Exception e) {
-                            sseEmitters.remove(member.getId());
+                List<Member> all = memberRepository.findAll();
+                for (Member member : all) {
+                    if (sseEmitters.containsKey(member.getId())) {
+                        SseEmitter sseEmitter = sseEmitters.get(member.getId());
+                        if(sseEmitter!=null) {
+                            try {
+                                sseEmitter.send(SseEmitter.event().name("ess").data(bus));
+                                Thread.sleep(1000);
+                            } catch (Exception e) {
+                                sseEmitters.remove(member.getId());
+                            }
                         }
+                        else
+                            return;
                     }
-                    else
-                        return;
                 }
             }
 
