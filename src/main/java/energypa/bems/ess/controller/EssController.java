@@ -20,8 +20,8 @@ public class EssController {
 
     @Operation(method = "post", summary = "ESS 모니터링 서비스 API(30초 단위)")
     @PostMapping("/ess/monitor")
-    public ResponseEntity<?> EssMonitorController() {
-        essService.essMonitorService();
+    public ResponseEntity<?> EssMonitorController(@CurrentUser UserPrincipal userPrincipal) {
+        essService.essMonitorService(userPrincipal);
         return ResponseEntity.ok(true);
     }
 

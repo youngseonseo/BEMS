@@ -2,6 +2,9 @@ package energypa.bems.ess.service;
 
 import energypa.bems.energy.repository.EssBatteryRepository;
 import energypa.bems.ess.dto.BusDto;
+import energypa.bems.login.config.security.token.CurrentUser;
+import energypa.bems.login.config.security.token.UserPrincipal;
+import energypa.bems.login.domain.Member;
 import energypa.bems.login.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +22,7 @@ public class EssService {
     private final EssBatteryRepository essBatteryRepository;
     private final MemberRepository memberRepository;
 
-    public void essMonitorService() {
+    public void essMonitorService(@CurrentUser UserPrincipal userPrincipal) {
 
         try {
 
@@ -28,17 +31,17 @@ public class EssService {
             Timestamp endDt = new Timestamp(now.getYear()-1,now.getMonth()-3,now.getDate()+15, now.getHours(),now.getMinutes(),now.getSeconds(), now.getNanos());
 
             List<BusDto> aBus = essBatteryRepository.findA_bus(startDt, endDt);
-
+            Member member = memberRepository.findById(userPrincipal.getId()).get();
 
             for (BusDto bus : aBus) {
-                if (sseEmitters.containsKey(1L)) {
-                    SseEmitter sseEmitter = sseEmitters.get(1L/**userId*/);
+                if (sseEmitters.containsKey(member.getId())) {
+                    SseEmitter sseEmitter = sseEmitters.get(member.getId());
                     if(sseEmitter!=null) {
                         try {
                             sseEmitter.send(SseEmitter.event().name("ess").data(bus));
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            sseEmitters.remove(1L/**userId*/);
+                            sseEmitters.remove(member.getId());
                         }
                     }
                     else
