@@ -14,7 +14,7 @@ import java.util.List;
 public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMinute, Long> {
 
     // graph1
-    @Query( value = "select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where date(bpm.timestamp) between date_sub(:now, interval 1 MONTH) and :now",
+    @Query( value = "select bpm.timestamp, bpm.A_Consumption + bpm.B_Consumption + bpm.C_Consumption from BuildingPerMinute bpm where date(bpm.timestamp) between date_sub(:now, interval 10 DAY) and :now",
             nativeQuery = true
     )
     List<Object[]> getPrevBuildingConsumption(@Param("now") Timestamp now);
