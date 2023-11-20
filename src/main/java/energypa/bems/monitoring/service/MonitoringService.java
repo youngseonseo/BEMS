@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MonitoringService {
 
-    public static final long TIMEOUT = 60L * 10000;
+    public static final long TIMEOUT = 60L * 100000;
     private final BuildingPerTenMinuteRepository floorRepository;
     private final BuildingPerMinuteRepository buildingRepository;
     private final SseRepository sseRepository;
