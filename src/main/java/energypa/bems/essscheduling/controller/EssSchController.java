@@ -1,7 +1,6 @@
 package energypa.bems.essscheduling.controller;
 
 import energypa.bems.energy.domain.BuildingPerTenMinute;
-import energypa.bems.essscheduling.service.EssSchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class EssSchController {
 
-    private final EssSchService essSchService;
+//    private final EssSchService essSchService;
 
     @Operation(summary = "ESS battery scheduling 모니터링 요청", description = "유저가 ESS battery scheduling 모니터링을 요청합니다.")
     @ApiResponses({
@@ -32,6 +31,6 @@ public class EssSchController {
     })
     @GetMapping
     public void monitorEss() {
-        essSchService.workWithAIServer();
+//        essSchService.workWithAIServer();
     }
 }
