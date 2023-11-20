@@ -36,7 +36,7 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
     public static Map<Long, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
-    public static final long TIMEOUT = 60L * 1000;
+    public static final long TIMEOUT = 60L * 1000 * 60 * 10;   // 10 분
 
     @Operation(method = "get", summary = "새로운 알람을 확인하는 API")
     @GetMapping("/notifications/new")
