@@ -49,11 +49,12 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     )
     List<Object[]> getPrevDailyConsumption(@Param("lastWeek") String lastWeek, @Param("yesterday") String yesterday);
 
+    /**
     @Query(
             value = "select date(date_sub(timestamp, interval (dayofweek(timestamp)-7) DAY)) as end, " +
-                    "       sum(a_consumption), " +
-                    "       sum(b_consumption), " +
-                    "       sum(c_consumption) " +
+                    "sum(a_consumption), " +
+                    "sum(b_consumption), " +
+                    "sum(c_consumption) " +
                     "from BuildingPerMinute " +
                     "where timestamp < :lastWeek and timestamp > :lastMonth " +
                     "group by date_format(timestamp, '%Y%U')",
@@ -67,6 +68,6 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
     )
     List<Object[]> getMonthlyConsumption(@Param("lastMonth") String lastMonth);
 
-
+    */
 
 }
