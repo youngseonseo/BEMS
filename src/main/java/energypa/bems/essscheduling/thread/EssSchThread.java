@@ -74,7 +74,7 @@ public class EssSchThread implements Runnable {
 
         // 전달할 json 데이터
         EssSchRequestDto essRequestDto = EssSchRequestDto.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(bdConsumption.getTimestamp())
                 .soc(50.0)
                 .batteryPower(0.0)
                 .consumptionOf561(bdConsumption.getA_Consumption())

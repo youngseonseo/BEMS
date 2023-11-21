@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Getter
 @Builder
 public class EssSchRequestDto {
 
     @JsonProperty("TIMESTAMP")
-    private LocalDateTime timestamp;
+    private Timestamp timestamp;
 
     @JsonProperty("SOC")
     private Double soc;
