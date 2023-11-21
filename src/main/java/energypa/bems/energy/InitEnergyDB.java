@@ -23,14 +23,13 @@ public class InitEnergyDB {
     private final BuildingPerMinuteRepository buildingPerMinuteRepository;
     private final BuildingEnergyPriceRepository buildingEnergyPriceRepository;
     private final EssBatteryRepository essBatteryRepository;
+    private final FloorOneHourRepository floorOneHourRepository;
     CsvReadService csvReadService = new CsvReadService();
 
 
     @PostConstruct
     public void init() {
-//
-//        buildingInit();
-//        log.info("building init completed!");
+
 
         buildingPerMinuteInit();
         log.info("buildingPerMinute init completed");
@@ -41,6 +40,9 @@ public class InitEnergyDB {
         essInit();
         log.info("ess init completed");
 
+        floorOneHourInit();
+        log.info("floor one hour init completed");
+        
         buildingEnergyPriceInit();
         log.info("buildingEnergyPrice init completed");
 
@@ -48,18 +50,6 @@ public class InitEnergyDB {
     }
 
 
-    public void buildingInit(){  // 동별 전력 사용량 DB 저장 - 아파트_동별_소비전력_전력분배
-        if(buildingRepository.findById(10000L).isPresent()){
-            return;
-        }
-        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/아파트_동별_소비전력_전력분배_2022-07-18~2023-08-30.csv");
-        for (Map<String, Object> map : maps) {
-
-            Building building = new Building(Timestamp.valueOf((String) map.get("TIMESTAMP")), Double.valueOf((String) map.get("561_CONSUMPTION(kW)")), Double.valueOf((String)map.get("562_CONSUMPTION(kW)")), Double.valueOf((String) map.get("563_CONSUMPTION(kW)")), Double.valueOf((String) map.get("561_bus")), Double.valueOf((String)map.get("562_bus")), Double.valueOf((String) map.get("563_bus")));
-            buildingRepository.save(building);
-
-        }
-    }
 
     public void floorInit(){    // 층별 전력 사용량 DB 저장 - [10분 단위] 아파트_층별_소비전력
         if(buildingPerTenMinuteRepository.findById(10000L).isPresent()){
@@ -101,6 +91,19 @@ public class InitEnergyDB {
 
             EssBattery essBattery = new EssBattery(Timestamp.valueOf((String) map.get("TIMESTAMP")), Integer.valueOf((String) map.get("561_BUS")), Integer.valueOf((String)map.get("562_BUS")), Integer.valueOf((String) map.get("563_BUS")));
             essBatteryRepository.save(essBattery);
+        }
+    }
+
+
+    public void floorOneHourInit(){           // 24시간 AI 예측을 위한 값
+        if(floorOneHourRepository.findById(4000L).isPresent()){
+            return;
+        }
+        List<Map<String, Object>> maps = csvReadService.readCsv("preprocessed_data/[DB]아파트_층별_소비전력_1시간_2023-03-16 06.00.00 ~ 2023-08-30 10.00.00.csv");
+        for (Map<String, Object> map : maps) {
+
+            FloorOneHour floorOneHour = new FloorOneHour(Timestamp.valueOf((String) map.get("TIMESTAMP")),Integer.valueOf((String) map.get("BUILDING")), Integer.valueOf((String)map.get("FLOOR")), Double.valueOf((String) map.get("CONSUMPTION(kW)")));
+            floorOneHourRepository.save(floorOneHour);
 
         }
 
