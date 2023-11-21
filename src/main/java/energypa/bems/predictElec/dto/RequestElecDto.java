@@ -12,7 +12,7 @@ public class RequestElecDto {
     private String timestamp;
     private Integer Building;
     private Integer Floor;
-    private Integer Consumption;
+    private Double Consumption;
 
 
 }
