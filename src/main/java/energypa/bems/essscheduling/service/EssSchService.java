@@ -21,6 +21,6 @@ public class EssSchService {
     public void init() {
 
         Thread essSchThread = new Thread(new EssSchThread(buildingRepository, objectMapper));
-        essSchThread.start();
+//        essSchThread.start();
     }
 }
