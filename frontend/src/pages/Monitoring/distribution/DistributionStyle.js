@@ -1,5 +1,10 @@
 import styled from "styled-components";
-
+export const BackGround = styled.div`
+  background-color: #292929;
+  padding: 50px 50px;
+  display: flex;
+  height: 90vh;
+`;
 export const DistBack = styled.div`
   display: flex;
   flex-direction: column;
@@ -22,16 +27,12 @@ export const BuildingLight = styled.div`
 `;
 export const Buildingcontainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: end;
   align-items: center;
+  gap: 5vw;
   color: white;
 `;
 
-export const BatteryImage = styled.img`
-  transform: rotate(90deg);
-  position: relative;
-  z-index: 4;
-`;
 export const BoxLine1_a = styled.div`
   width: 23vw;
   height: 100px;
@@ -45,7 +46,7 @@ export const BoxLine1_a = styled.div`
   right: 16vw;
 `;
 export const BoxLine1_b = styled.div`
-  width: 37vw;
+  width: 40vw;
   height: 100px;
   border-right: ${(props) =>
     props.bus === 1 ? `7px solid yellow` : ` 7px solid black `};
@@ -54,10 +55,10 @@ export const BoxLine1_b = styled.div`
   position: relative;
   z-index: 2;
   top: -20px;
-  right: 30.5vw;
+  right: 33vw;
 `;
 export const BoxLine1_c = styled.div`
-  width: 53vw;
+  width: 56vw;
   height: 100px;
   border-right: ${(props) =>
     props.bus === 1 ? `7px solid yellow` : ` 7px solid black `};
@@ -66,7 +67,7 @@ export const BoxLine1_c = styled.div`
   position: relative;
   z-index: 3;
   top: -30px;
-  right: 45.2vw;
+  right: 50vw;
 `;
 export const BoxLine2_a = styled.div`
   width: 23vw;
@@ -81,7 +82,7 @@ export const BoxLine2_a = styled.div`
   right: 16vw;
 `;
 export const BoxLine2_b = styled.div`
-  width: 37vw;
+  width: 40vw;
   height: 100px;
   border-right: ${(props) =>
     props.bus === 2 ? `7px solid yellow` : `7px solid black `};
@@ -90,10 +91,10 @@ export const BoxLine2_b = styled.div`
   position: relative;
   z-index: 2;
   top: -20px;
-  right: 30.5vw;
+  right: 33vw;
 `;
 export const BoxLine2_c = styled.div`
-  width: 53vw;
+  width: 57vw;
   height: 100px;
   border-right: ${(props) =>
     props.bus === 2 ? `7px solid yellow` : `7px solid black `};
@@ -102,13 +103,14 @@ export const BoxLine2_c = styled.div`
   position: relative;
   z-index: 3;
   top: -10px;
-  right: 45.2vw;
+  right: 50vw;
 `;
 
 export const OneBox = styled.div`
   width: 10vw;
   height: 12vh;
-  border: 7px solid yellow;
+  border: ${(props) =>
+    props.open === true ? `7px solid yellow` : `7px solid black `};
   position: relative;
   z-index: 1;
   right: 10vw;
@@ -116,7 +118,8 @@ export const OneBox = styled.div`
 export const TwoBox = styled.div`
   width: 6vw;
   height: 12vh;
-  border-top: 7px solid yellow;
+  border-top: ${(props) =>
+    props.open === true ? `7px solid yellow` : `7px solid black `};
   position: relative;
   z-index: 1;
   top: 6vh;
@@ -125,7 +128,8 @@ export const TwoBox = styled.div`
 export const ThreeBox = styled.div`
   width: 0vw;
   height: 63vh;
-  border: 3.5px solid yellow;
+  border: ${(props) =>
+    props.open === true ? `3.5px solid yellow` : `3.5px solid black `};
   position: relative;
   z-index: 4;
   right: 14vw;
