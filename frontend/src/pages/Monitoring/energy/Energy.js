@@ -4,7 +4,9 @@ import {
   BackGround,
   Graph1,
   GraphContainer,
+  Graph2Container,
   EnergyContainer,
+  DurationSelect,
   Graph2,
   Graph3,
   SelectBox,
@@ -26,6 +28,7 @@ import {
   Tooltip,
   Legend,
   Label,
+  Cell,
 } from "recharts";
 
 export default function EnergyConsumptionMonitoring() {
@@ -33,7 +36,10 @@ export default function EnergyConsumptionMonitoring() {
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
+  const [input, setInput] = useState([]);
+  const [Check, setCheck] = useState(false);
   const [ghDuration, setGhDuration] = useState("date");
+  const moment = require("moment");
 
   const postDate = () => {
     const subscribeUrl = `http://localhost:8080/api/monitor/building?duration=${ghDuration}`;
@@ -44,7 +50,7 @@ export default function EnergyConsumptionMonitoring() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "text/event-stream",
         },
-        heartbeatTimeout: 10000000,
+        heartbeatTimeout: 10 * 60 * 1000,
         withCredentials: true,
       });
 
@@ -52,16 +58,22 @@ export default function EnergyConsumptionMonitoring() {
         console.log("this is opened building");
       };
       eventSource1.addEventListener("sendPrevBuildingInfo", (event) => {
-        console.log(event.data);
         const json = JSON.parse(event.data);
         setData1(json.graph1);
         setData2(json.graph2);
         setData3(json.graph3);
-        eventSource1.close();
+      });
+
+      eventSource1.addEventListener("graph1", (event) => {
+        const json = JSON.parse(event.data);
+        console.log(json);
+        setInput(json);
+        setData1((prev) => [...prev, json]);
       });
 
       eventSource1.addEventListener("error", (e) => {
         console.log("Building connet Error");
+        setCheck(true);
         eventSource1.close();
       });
     }
@@ -69,7 +81,25 @@ export default function EnergyConsumptionMonitoring() {
   const onChangeDuration = (e) => {
     setGhDuration(e.target.value);
   };
-  console.log(ghDuration);
+  const formatXAxisGraph1 = (tickItem) => {
+    return `${moment(tickItem).format("M/D")}`;
+  };
+  const formatXAxis = (tickItem) => {
+    if (tickItem && ghDuration === "date")
+      return `${moment(tickItem).format("M/D")}`;
+    else if (tickItem && ghDuration === "week")
+      return `${moment(tickItem).format("M월D주")}`;
+    else if (tickItem && ghDuration === "month")
+      return `${moment(tickItem).format("M")}월`;
+    else return tickItem;
+  };
+  const formatYAxis = (tickItem) => tickItem.toLocaleString();
+  const data2format = [
+    { name: "561동", value: data2.totalAConsumption },
+    { name: "562동", value: data2.totalBConsumption },
+    { name: "563동", value: data2.totalCConsumption },
+  ];
+  const colors = ["#3D87FF", "#A665F5", "#FA995C"];
 
   useEffect(() => {
     postDate();
@@ -81,18 +111,6 @@ export default function EnergyConsumptionMonitoring() {
       <BackGround>
         <NavigationBar name="energy_consumption" />
         <EnergyContainer>
-          <SelectBox onChange={onChangeDuration}>
-            <option key={"date"} value={"date"}>
-              date
-            </option>
-            <option key={"week"} value={"week"}>
-              week
-            </option>
-            <option key={"month"} value={"month"}>
-              month
-            </option>
-          </SelectBox>
-
           <GraphContainer>
             <Graph1>
               <div>전체 전력 소비량/예측량</div>
@@ -101,16 +119,30 @@ export default function EnergyConsumptionMonitoring() {
                 height={300}
                 data={data1}
                 margin={{
-                  top: 10,
-                  right: 30,
-                  left: 0,
+                  top: 40,
+                  right: 40,
+                  left: 20,
                   bottom: 0,
                 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="timestamp" />
+                <CartesianGrid
+                  strokeDasharray={3}
+                  vertical={false}
+                  orientation={0}
+                />
+                <XAxis
+                  dataKey="timestamp"
+                  tickFormatter={formatXAxisGraph1}
+                  interval={1440}
+                />
                 <Label value="date" position="insideBottom" />
-                <YAxis />
+                <YAxis
+                  label={{
+                    value: "kW",
+                    offset: 30,
+                    position: "top",
+                  }}
+                />
                 <Tooltip />
                 <Area
                   name="총 전력 소비량"
@@ -121,70 +153,100 @@ export default function EnergyConsumptionMonitoring() {
                 />
               </AreaChart>
             </Graph1>
-            <Graph2>
-              <div>동별 전력 소비량</div>
-              <BarChart
-                width={500}
-                height={300}
-                data={data2}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey={ghDuration} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar name="561동" dataKey="totalAConsumption" fill="#3D87FF" />
-                <Bar name="562동" dataKey="totalBConsumption" fill="#A665F5" />
-                <Bar name="563동" dataKey="totalCConsumption" fill="#FA995C" />
-              </BarChart>
-            </Graph2>
-            <Graph3>
-              <div>동별 전력 소비 비교</div>
-              <LineChart
-                width={500}
-                height={300}
-                data={data3}
-                margin={{
-                  top: 5,
-                  right: 20,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  name="561동"
-                  type="linear"
-                  dataKey="totalAConsumption"
-                  stroke="#3D87FF"
-                  activeDot={{ r: 1 }}
-                />
-                <Line
-                  name="562동"
-                  type="linear"
-                  dataKey="totalBConsumption"
-                  stroke="#A665F5"
-                  activeDot={{ r: 1 }}
-                />
-                <Line
-                  name="563동"
-                  type="linear"
-                  dataKey="totalCConsumption"
-                  stroke="#FA995C"
-                  activeDot={{ r: 1 }}
-                />
-              </LineChart>
-            </Graph3>
+            <DurationSelect>
+              기간 설정
+              <SelectBox onChange={onChangeDuration}>
+                <option key={"date"} value={"date"}>
+                  date
+                </option>
+                <option key={"week"} value={"week"}>
+                  week
+                </option>
+                <option key={"month"} value={"month"}>
+                  month
+                </option>
+              </SelectBox>
+            </DurationSelect>
+
+            <Graph2Container>
+              <Graph2>
+                <div>동별 전력 소비량</div>
+                <BarChart
+                  width={500}
+                  height={300}
+                  data={data2format}
+                  margin={{
+                    top: 5,
+                    right: 20,
+                    left: 30,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis tickFormatter={formatYAxis} />
+                  <Tooltip />
+                  <Bar dataKey="value" barSize={50}>
+                    {data2format.map((value, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index]}
+                        strokeWidth={3}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </Graph2>
+              <Graph3>
+                <div>동별 전력 소비 비교</div>
+                <LineChart
+                  width={500}
+                  height={300}
+                  data={data3}
+                  margin={{
+                    top: 5,
+                    right: 20,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="2 2" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={formatXAxis}
+                    interval={0}
+                  />
+                  <YAxis
+                    tickFormatter={formatYAxis}
+                    label={{
+                      value: "kW",
+                      offset: 30,
+                      position: "top",
+                    }}
+                  />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    name="561동"
+                    type="linear"
+                    dataKey="totalAConsumption"
+                    stroke="#3D87FF"
+                  />
+                  <Line
+                    name="562동"
+                    type="linear"
+                    dataKey="totalBConsumption"
+                    stroke="#A665F5"
+                  />
+                  <Line
+                    name="563동"
+                    type="linear"
+                    dataKey="totalCConsumption"
+                    stroke="#FA995C"
+                  />
+                </LineChart>
+              </Graph3>
+            </Graph2Container>
           </GraphContainer>
         </EnergyContainer>
       </BackGround>

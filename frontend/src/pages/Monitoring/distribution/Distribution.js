@@ -31,14 +31,12 @@ export default function ElectricDistributionPage({
   console.log("this is opened : ", isopened);
   const postESS = () => {
     const accessToken = localStorage.getItem("accessToken");
-    axios.post("http://localhost:8080/api/ess/monitor", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    axios.post("http://localhost:8080/api/ess/monitor");
   };
 
   useEffect(() => {
     postESS();
-  }, [isopened]);
+  }, []);
 
   return (
     <div>
@@ -48,15 +46,6 @@ export default function ElectricDistributionPage({
         <DistBack>
           <TextBus1>BUS1</TextBus1>
           <Buildingcontainer>
-            <BatteryImage
-              src="/image/battery-elec.png"
-              width="150px"
-              height="150px"
-              alt="battery"
-            />
-            <OneBox open={isopened}></OneBox>
-            <TwoBox open={isopened}></TwoBox>
-            <ThreeBox open={isopened}></ThreeBox>
             <Building>
               <BoxLine1_a bus={busA}></BoxLine1_a>
               <BuildingLight bus={busA}>

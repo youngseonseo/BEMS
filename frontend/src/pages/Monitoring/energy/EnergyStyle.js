@@ -8,36 +8,50 @@ export const BackGround = styled.div`
 `;
 
 export const Graph1 = styled.div`
-  background-color: #353535;
-  grid-column: 1 / 3;
-  border-radius: 10px;
+  width: auto;
+  height: 370px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 10px;
+  background-color: #353535;
+  border-radius: 10px;
 `;
 export const Graph2 = styled.div`
+  width: 35vw;
+  height: 370px;
   background-color: #353535;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 15px;
 `;
 export const Graph3 = styled.div`
+  width: 35vw;
+  height: 370px;
   background-color: #353535;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 15px;
 `;
 
 export const GraphContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 35vw);
-  grid-template-rows: repeat(2, 350px);
+  display: flex;
+  flex-direction: column;
   gap: 15px;
+  color: white;
+`;
+export const Graph2Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: auto;
+  gap: 20px;
   color: white;
 `;
 
@@ -49,12 +63,18 @@ export const EnergyContainer = styled.div`
 `;
 
 export const SelectBox = styled.select`
-  width: 150px;
-  height: 50px;
-  border-radius: 10px;
-  border: 3px solid white;
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
   color: white;
   font-size: 15px;
   background-color: #2d3648;
-  margin-right: 0 auto;
+  float: right;
+`;
+
+export const DurationSelect = styled.div`
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
 `;
