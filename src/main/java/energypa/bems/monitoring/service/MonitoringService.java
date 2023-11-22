@@ -1,13 +1,14 @@
 package energypa.bems.monitoring.service;
 
+import energypa.bems.chat.entity.Matching;
 import energypa.bems.energy.domain.BuildingPerTenMinute;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
+import energypa.bems.energy.repository.TotalOneHourPredictRepository;
+import energypa.bems.energy.repository.TotalOneHourRepository;
 import energypa.bems.login.config.security.token.CurrentUser;
 import energypa.bems.login.config.security.token.UserPrincipal;
-import energypa.bems.monitoring.dto.EachConsumption;
-import energypa.bems.monitoring.dto.MonitorBuildingResponse;
-import energypa.bems.monitoring.dto.TotalConsumption;
+import energypa.bems.monitoring.dto.*;
 import energypa.bems.monitoring.repository.SseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,8 @@ public class MonitoringService {
     private final BuildingPerTenMinuteRepository floorRepository;
     private final BuildingPerMinuteRepository buildingRepository;
     private final SseRepository sseRepository;
+    private final TotalOneHourRepository totalOneHourRepository;
+    private final TotalOneHourPredictRepository totalOneHourPredictRepository;
 
     public SseEmitter formSseConnectionForFloor(int building, int floor, @CurrentUser UserPrincipal userPrincipal) {
 
@@ -94,29 +98,36 @@ public class MonitoringService {
     public LocalDateTime manipulateNowForBuilding() {
 
         LocalDateTime now = LocalDateTime.now();
+        now = now.minusYears(0L);
+        now = now.minusMonths(3L);
+        return now.plusDays(4L).withMinute(0).withSecond(0).withNano(0);
+    }
+    public LocalDateTime manipulateNowForBuildingforGraph2() {
+
+        LocalDateTime now = LocalDateTime.now();
         now = now.minusYears(1L);
         now = now.minusMonths(2L);
         return now.plusDays(8L);
     }
 
     public String getYesterday() {
-        LocalDateTime todayDate = manipulateNowForBuilding();
+        LocalDateTime todayDate = manipulateNowForBuildingforGraph2();
         return todayDate.toLocalDate().minusDays(1L).toString();
     }
     public String getOneWeekAgo() {
-        LocalDateTime todayDate = manipulateNowForBuilding();
+        LocalDateTime todayDate = manipulateNowForBuildingforGraph2();
         return todayDate.toLocalDate().minusDays(7L).toString();
     }
 
     public String getLastWeek() {
-        LocalDateTime todayDate = manipulateNowForBuilding();
+        LocalDateTime todayDate = manipulateNowForBuildingforGraph2();
         int yoilNum = todayDate.getDayOfWeek().getValue();
 
         return todayDate.toLocalDate().minusDays(yoilNum).toString();
     }
 
     public String getLastMonth() {
-        LocalDateTime todayDate = manipulateNowForBuilding();
+        LocalDateTime todayDate = manipulateNowForBuildingforGraph2();
         todayDate = todayDate.minusMonths(1L);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         return todayDate.format(formatter);
@@ -155,9 +166,26 @@ public class MonitoringService {
         Timestamp now = Timestamp.valueOf(manipulateNowForBuilding());
         System.out.println("now = " + now);
 
-        List<TotalConsumption> graph1 = buildingRepository.getPrevBuildingConsumption(now).stream()
-                .map(row -> new TotalConsumption((Timestamp) row[0], (int)Math.round((Double) row[1])))
+        List<ImplicitTotalConsumption> list = totalOneHourRepository.getPrevBuildingConsumption(now).stream()
+                .map(row -> new ImplicitTotalConsumption((Timestamp) row[0], (int)Math.round((Double) row[1]*1000)))
                 .collect(Collectors.toList());
+
+
+        List<ImplicitTotalConsumption> predictList = totalOneHourPredictRepository.getPrevBuildingConsumption(now).stream()
+                .map(row -> new ImplicitTotalConsumption((Timestamp) row[0], (int)Math.round((Double) row[1]*1000)))
+                .collect(Collectors.toList());
+
+
+        List<TotalConsumption> graph1 = new ArrayList<>();
+        for (int i=0; i< list.size(); i++){
+            TotalConsumption totalConsumption = new TotalConsumption(list.get(i).getTimestamp(), list.get(i).getTotalConsumption(),predictList.get(i).getTotalConsumption());
+            graph1.add(totalConsumption);
+        }
+        for (int i=24*5; i<24*6; i++){
+            TotalConsumption totalConsumption = new TotalConsumption(predictList.get(i).getTimestamp(), 0,predictList.get(i).getTotalConsumption());
+            graph1.add(totalConsumption);
+        }
+
 
         MonitorBuildingResponse monitorBuildingResponse = null;
         if (duration.equals("date")) {
@@ -167,9 +195,12 @@ public class MonitoringService {
                     .collect(Collectors.toList())
                     .get(0);
 
+
             List<EachConsumption> graph3 = buildingRepository.getPrevDailyConsumption(getOneWeekAgo(), getYesterday()).stream()
                     .map(row -> new EachConsumption((Date) row[0], (int) Math.round((Double)row[1]), (int) Math.round((Double)row[2]), (int) Math.round((Double)row[3])))
                     .collect(Collectors.toList());
+
+
 
             monitorBuildingResponse = MonitorBuildingResponse.builder()
                     .graph1(graph1)

@@ -3,9 +3,9 @@ package energypa.bems.monitoring.scheduling;
 import energypa.bems.energy.domain.BuildingPerTenMinute;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.energy.repository.BuildingPerTenMinuteRepository;
-import energypa.bems.monitoring.dto.EachConsumption;
+import energypa.bems.energy.repository.TotalOneHourPredictRepository;
+import energypa.bems.energy.repository.TotalOneHourRepository;
 import energypa.bems.monitoring.dto.FloorInfo;
-import energypa.bems.monitoring.dto.Graph1Dto;
 import energypa.bems.monitoring.dto.TotalConsumption;
 import energypa.bems.monitoring.repository.SseRepository;
 import energypa.bems.monitoring.service.MonitoringService;
@@ -16,11 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 @Component
@@ -31,6 +29,8 @@ public class Scheduling {
     private final SseRepository sseRepository;
     private final BuildingPerTenMinuteRepository floorRepository;
     private final BuildingPerMinuteRepository buildingRepository;
+    private final TotalOneHourRepository totalOneHourRepository;
+    private final TotalOneHourPredictRepository totalOneHourPredictRepository;
 
     @Scheduled(cron = "0 0,10,20,30,40,50 * * * *")
     public void scheduleEvery10Min() {
@@ -59,20 +59,19 @@ public class Scheduling {
         }));
     }
 
-    @Scheduled(cron = "0 * * * * ?")
-    public void scheduleEveryMin() {
+    @Scheduled(cron = "0 0 0/1 * * *")
+    public void scheduleEveryHour() {
 
         Map<Long, SseEmitter> sseEmitterMap = sseRepository.getSseEmitterBuildingMap();
         Timestamp now = Timestamp.valueOf(monitoringService.manipulateNowWithSetSec0());
-//        System.out.println("now is= " + now);
+        System.out.println("now is= " + now);
         sseEmitterMap.values().stream().forEach((sseEmitter -> {
 
 
-            Double buildingConsumption = buildingRepository.getBuildingConsumption(now);
+            Double buildingConsumption = totalOneHourRepository.getBuildingConsumption(now);
+            Double predictConsumption = totalOneHourPredictRepository.getBuildingConsumption(now);
 
-            TotalConsumption currentTotalConsumption = new TotalConsumption(now, (int)Math.round((Double)buildingConsumption));
-            System.out.println("currentTotalConsumption = " + currentTotalConsumption);
-
+            TotalConsumption currentTotalConsumption = new TotalConsumption(now, (int)Math.round((Double)buildingConsumption*1000),(int)Math.round((Double)predictConsumption*1000));
 
             if (currentTotalConsumption != null) {
 
