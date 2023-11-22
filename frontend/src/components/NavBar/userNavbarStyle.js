@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const NavContainer = styled.div`
   width: 230px;
-  height: 200px;
+  height: 300px;
   border-radius: 10px;
   background-color: #6a6b6a;
   display: flex;
@@ -21,6 +21,26 @@ export const BigNavBill = styled.button`
   color: black;
   font-size: 18px;
   background: ${(props) => (props.name === "bill" ? "#c2c4c3" : "#545454")};
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 0px 10px;
+  gap: 8px;
+  &:hover {
+    border: 3px solid black;
+  }
+`;
+
+export const BigNavManage = styled.button`
+  width: 200px;
+  height: 50px;
+  border-radius: 4px;
+  border: ${(props) =>
+    props.name === "energy_management" ? "3px solid white" : "#545454"};
+  color: black;
+  font-size: 18px;
+  background: ${(props) =>
+    props.name === "energy_management" ? "#c2c4c3" : "#545454"};
   display: flex;
   justify-content: start;
   align-items: center;
