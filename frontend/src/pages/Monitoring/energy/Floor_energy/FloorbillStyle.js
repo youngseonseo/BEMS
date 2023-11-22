@@ -20,7 +20,7 @@ export const TextCont = styled.div`
 export const Graph1Cont = styled.div`
   background-color: #404040;
   width: 30vw;
-  height: 65vh;
+  height: 58vh;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -29,7 +29,7 @@ export const Graph1Cont = styled.div`
 `;
 export const Graph2Cont = styled.div`
   width: 30vw;
-  height: 65vh;
+  height: 58vh;
   background-color: #404040;
   border-radius: 10px;
   display: flex;
