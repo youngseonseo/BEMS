@@ -3,12 +3,15 @@ package energypa.bems.energy;
 import energypa.bems.energy.domain.*;
 import energypa.bems.energy.repository.*;
 import energypa.bems.energy.service.CsvReadService;
+import energypa.bems.predictElec.dto.RequestElecDto;
+import energypa.bems.predictElec.service.PythonServerConnection;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +21,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class InitEnergyDB {
 
-    private final BuildingRepository buildingRepository;
     private final BuildingPerTenMinuteRepository buildingPerTenMinuteRepository;
     private final BuildingPerMinuteRepository buildingPerMinuteRepository;
     private final BuildingEnergyPriceRepository buildingEnergyPriceRepository;
     private final EssBatteryRepository essBatteryRepository;
     private final FloorOneHourRepository floorOneHourRepository;
+    private final PythonServerConnection pythonServerConnection;
     CsvReadService csvReadService = new CsvReadService();
 
 
 //    @PostConstruct
-    public void init() {
+    public void init() throws IOException {
 
 
         buildingPerMinuteInit();
@@ -42,7 +45,10 @@ public class InitEnergyDB {
 
         floorOneHourInit();
         log.info("floor one hour init completed");
-        
+
+        floorOneHourPredictInit();
+        log.info("floor one hour predict init completed");
+
         buildingEnergyPriceInit();
         log.info("buildingEnergyPrice init completed");
 
@@ -95,7 +101,7 @@ public class InitEnergyDB {
     }
 
 
-    public void floorOneHourInit(){           // 24시간 AI 예측을 위한 값
+    public void floorOneHourInit(){           // 24시간 AI 예측을 위한 값 저장
         if(floorOneHourRepository.findById(4000L).isPresent()){
             return;
         }
@@ -109,6 +115,22 @@ public class InitEnergyDB {
 
 
     }
+
+
+    public void floorOneHourPredictInit() throws IOException {                // AI의 24시간 예측치 저장
+        if(floorOneHourRepository.findById(4000L).isPresent()){
+            return;
+        }
+//        Timestamp startDt = Timestamp.valueOf("2023-03-01 00:00:00");
+//        Timestamp betweenEndDt = new Timestamp(startDt.getYear(),startDt.getMonth()+1,startDt.getDate(), startDt.getHours(),startDt.getMinutes(),startDt.getSeconds(), startDt.getNanos());
+//        System.out.println("betweenEndDt = " + betweenEndDt);
+//        Timestamp endDt = Timestamp.valueOf("2023-09-01 00:00:00");
+//        for (int i=1; i<=4; i++){
+//            RequestElecDto requestElecDto = new RequestElecDto(betweenEndDt.toString(),561, i, 1);
+//            pythonServerConnection.PredictElec(requestElecDto);
+//        }
+    }
+
 
     public void buildingEnergyPriceInit(){           // 한달 단위 빌딩 에너지 사용량 저장 코드 (4월 ~ 8월)
         if(buildingEnergyPriceRepository.findById(15L).isPresent()){
@@ -144,7 +166,5 @@ public class InitEnergyDB {
 
 
     }
-
-
 
 }

@@ -1,7 +1,9 @@
 package energypa.bems.predictElec.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import energypa.bems.energy.domain.FloorOneHour;
 import energypa.bems.predictElec.dto.RequestElecDto;
+import energypa.bems.predictElec.dto.ReturnElecDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +23,7 @@ import java.util.Map;
 @RequestMapping
 public class PythonServerConnection {
 
-    public void PredictElec(RequestElecDto requestElecDto) throws IOException {
+    public List<ReturnElecDto> PredictElec(RequestElecDto requestElecDto) throws IOException {
 
 
         try {
@@ -38,8 +40,11 @@ public class PythonServerConnection {
             connection.setDoInput(true);
 
             try (DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());) {
-                // RequestBody 작성
-                String requestBody = "{ \"TIMESTAMP\": \"2023-08-13 17:00:00\", \"BUILDING\": 561, \"FLOOR\": 1, \"CONSUMPTION(kW)\": 2.1 }";
+
+
+                // RequestBody 동적으로 구성
+                ObjectMapper objectMapper = new ObjectMapper();
+                String requestBody = objectMapper.writeValueAsString(requestElecDto);
 
                 // RequestBody 전송
                 try (OutputStream os = connection.getOutputStream();
@@ -47,9 +52,6 @@ public class PythonServerConnection {
                     osw.write(requestBody);
                     osw.flush();
                 }
-
-//                dataOutputStream.writeBytes(str);
-//                dataOutputStream.flush();
 
                 // 응답(Response) 구조 작성
                 // Stream -> JSONObject
@@ -59,7 +61,6 @@ public class PythonServerConnection {
                 StringBuilder response = new StringBuilder();
                 while ((readline = br.readLine()) != null) {
                     response.append(readline);
-                    System.out.println("readline = " + readline);
                 }
 
 
@@ -67,15 +68,19 @@ public class PythonServerConnection {
                 connection.disconnect();
 
                 // JSON 객체로  변환
-                ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, Object> map = objectMapper.readValue(response.toString(),  new TypeReference<Map<String,Object>>(){});
 
                 List<Timestamp> timestampList =  (List<Timestamp>) map.get("TIMESTAMP");
                 List<Double> prediction =  (List<Double>) map.get("PREDICTION");
+                List<ReturnElecDto> returnElecDtoList = new ArrayList<>();
 
-                System.out.println("timestampList = " + timestampList);
-                System.out.println("prediction = " + prediction);
+                for (int i=0; i<24; i++){
+                    ReturnElecDto returnElecDto = new ReturnElecDto(Timestamp.valueOf(String.valueOf(timestampList.get(i))), Double.parseDouble(String.valueOf(prediction.get(i))), requestElecDto.getBuilding(), requestElecDto.getFloor());
+                    returnElecDtoList.add(returnElecDto);
+                }
+
                 connection.disconnect();
+                return returnElecDtoList;
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -83,7 +88,7 @@ public class PythonServerConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        return null;
+        return null;
     }
 
 }

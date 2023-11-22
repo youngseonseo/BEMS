@@ -1,6 +1,7 @@
 package energypa.bems.predictElec.controller;
 
 
+import energypa.bems.energy.domain.FloorOneHour;
 import energypa.bems.predictElec.dto.RequestElecDto;
 import energypa.bems.predictElec.dto.ReturnElecDto;
 import energypa.bems.predictElec.service.PythonServerConnection;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -20,8 +22,7 @@ public class RequestElecController {
     private final PythonServerConnection pythonServerConnection;
 
     @PostMapping(value = "/predict/electAmount")
-    public void requestPredictElec(@RequestBody RequestElecDto requestElecDto) throws IOException {
-        System.out.println("requestElecDto.getTimestamp() = " + requestElecDto.getTimestamp());
-        pythonServerConnection.PredictElec(requestElecDto);
+    public List<ReturnElecDto> requestPredictElec(@RequestBody RequestElecDto requestElecDto) throws IOException {
+        return pythonServerConnection.PredictElec(requestElecDto);
     }
 }
