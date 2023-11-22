@@ -98,7 +98,6 @@ public class ApiService {
             List<Map<String, Object>> unitCostList =  (List<Map<String, Object>>) map.get("data");
 
             for(Map<String, Object> item :unitCostList){
-
                 return  Double.valueOf(item.get("unitCost").toString());
             }
 

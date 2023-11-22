@@ -64,7 +64,7 @@ public class Scheduling {
 
         Map<Long, SseEmitter> sseEmitterMap = sseRepository.getSseEmitterBuildingMap();
         Timestamp now = Timestamp.valueOf(monitoringService.manipulateNowWithSetSec0());
-        System.out.println("now is= " + now);
+//        System.out.println("now is= " + now);
         sseEmitterMap.values().stream().forEach((sseEmitter -> {
 
 
