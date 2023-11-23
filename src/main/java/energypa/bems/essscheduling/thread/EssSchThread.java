@@ -32,7 +32,7 @@ public class EssSchThread implements Runnable {
     private final BuildingPerMinuteRepository buildingRepository;
     private final MemberRepository memberRepository;
 
-    private long buildingPerMinuteId = 0l;
+    private long buildingPerMinuteId = 1l;
     private boolean isRunning = true;
     private EssSchAiResponseDto essResponseDto = null;
 
