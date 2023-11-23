@@ -1,4 +1,4 @@
-package energypa.bems.essscheduling.dto;
+package energypa.bems.essscheduling.dto.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class EssSchResponseDto {
+public class EssSchAiResponseDto {
 
     @JsonProperty("TIMESTAMP")
     private String timestamp;
@@ -28,9 +28,4 @@ public class EssSchResponseDto {
 
     @JsonProperty("NET_LOAD")
     private Double netLoad;
-
-    public EssSchResponseDto(Double soc, Double batteryPower) {
-        this.soc = soc;
-        this.batteryPower = batteryPower;
-    }
 }

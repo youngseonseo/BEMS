@@ -1,4 +1,4 @@
-package energypa.bems.essscheduling.dto;
+package energypa.bems.essscheduling.dto.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class EssSchRequestDto {
+public class EssSchAiRequestDto {
 
     @JsonProperty("TIMESTAMP")
     private String timestamp;
