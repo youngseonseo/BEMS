@@ -1,17 +1,15 @@
-package energypa.bems.essscheduling.dto;
+package energypa.bems.essscheduling.dto.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-import java.time.LocalDateTime;
-
-@Getter
+@Data
 @Builder
-public class EssSchRequestDto {
+public class EssSchAiRequestDto {
 
     @JsonProperty("TIMESTAMP")
-    private LocalDateTime timestamp;
+    private String timestamp;
 
     @JsonProperty("SOC")
     private Double soc;

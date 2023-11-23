@@ -1,28 +1,40 @@
 package energypa.bems.essscheduling.thread;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
-import energypa.bems.essscheduling.dto.EssSchRequestDto;
+import energypa.bems.essscheduling.dto.ai.EssSchAiRequestDto;
+import energypa.bems.essscheduling.dto.ai.EssSchAiResponseDto;
+import energypa.bems.essscheduling.dto.front.EssSchFrontResponseDto;
+import energypa.bems.essscheduling.dto.front.Graph1;
+import energypa.bems.essscheduling.dto.front.Graph2;
+import energypa.bems.essscheduling.dto.front.Graph3;
+import energypa.bems.login.domain.Member;
+import energypa.bems.login.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
+
+import static energypa.bems.notification.controller.NotificationController.sseEmitters;
 
 @Slf4j
 @RequiredArgsConstructor
 public class EssSchThread implements Runnable {
 
     private final BuildingPerMinuteRepository buildingRepository;
-    private final ObjectMapper objectMapper;
+    private final MemberRepository memberRepository;
 
     private long buildingPerMinuteId = 1l;
     private boolean isRunning = true;
+    private EssSchAiResponseDto essResponseDto = null;
 
     @Override
     public void run() {
@@ -34,20 +46,23 @@ public class EssSchThread implements Runnable {
                 BuildingPerMinute bdConsumption = getBdConsumptionFromDb();
 
                 // AI 서버에 요청 보내고 응답받기
-                workWithAIServer(bdConsumption);
+                essResponseDto = workWithAIServer(essResponseDto, bdConsumption);
 
-                // 클라이언트에게 json 전달
-
+                // SSE 연결 통해서 클라이언트에게 json 전달
+                sendJsonToClient(bdConsumption);
 
                 // 쓰레드 휴식
                 Thread.sleep(1000*5);
             }
             catch (IllegalStateException e) {
                 isRunning = false;
-                log.info("BuildingPerMinute 전체 데이터 조회 완료! ESS battery scheduling 모니터링을 종료합니다.");
+                log.info("BuildingPerMinute 전체 데이터 조회 완료! ESS battery scheduling 모니터링을 종료합니다.", e);
             }
-            catch (JsonProcessingException e) {
-                log.error("EssSchRequestDto 객체를 JSON으로 변환하는데 실패했습니다!", e);
+            catch (URISyntaxException e) {
+                log.error("AI 서버 요청 URI가 유효하지 않습니다!", e);
+            }
+            catch (IOException e) {
+                log.error("클라이언트와 백엔드 서버 간의 SSE 연결이 종료되어 JSON을 전달할 수 없습니다!", e);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
@@ -57,7 +72,7 @@ public class EssSchThread implements Runnable {
 
     private BuildingPerMinute getBdConsumptionFromDb() throws IllegalStateException {
 
-        Optional<BuildingPerMinute> bdConsumptionOp = buildingRepository.findById(buildingPerMinuteId++);
+        Optional<BuildingPerMinute> bdConsumptionOp = buildingRepository.findById(buildingPerMinuteId);
 
         // DB(BuildingPerMinute) 데이터를 모두 조회한 경우 - ESS battery scheduling 모니터링 종료
         if (bdConsumptionOp.isEmpty()) {
@@ -67,33 +82,106 @@ public class EssSchThread implements Runnable {
         return bdConsumptionOp.get();
     }
 
-    private void workWithAIServer(BuildingPerMinute bdConsumption) throws JsonProcessingException {
+    private EssSchAiResponseDto workWithAIServer(EssSchAiResponseDto essSchResponseDto, BuildingPerMinute bdConsumption) throws URISyntaxException {
 
         // 요청 보낼 ai 서버의 URL
-        String url = "http://127.0.0.1:10000/ess/optimal";
+        URI url = new URI("http://127.0.0.1:10000/ess/optimal");
 
         // 전달할 json 데이터
-        EssSchRequestDto essRequestDto = EssSchRequestDto.builder()
-                .timestamp(LocalDateTime.now())
-                .soc(50.0)
-                .batteryPower(0.0)
+        double soc = 50.0;
+        double batteryPower = 0.0;
+        if (buildingPerMinuteId++ > 1l) {
+            soc = essSchResponseDto.getSoc();
+            batteryPower = essSchResponseDto.getBatteryPower();
+        }
+
+        EssSchAiRequestDto essRequestDto = EssSchAiRequestDto.builder()
+                .timestamp(bdConsumption.getTimestamp().toString())
+                .soc(soc)
+                .batteryPower(batteryPower)
                 .consumptionOf561(bdConsumption.getA_Consumption())
                 .consumptionOf562(bdConsumption.getB_Consumption())
                 .consumptionOf563(bdConsumption.getC_Consumption())
                 .build();
+        log.info("[AI 요청] " + essRequestDto); //
 
-        String essRequestJson = objectMapper.writeValueAsString(essRequestDto);
+        // RestTemplate 통해서 ai 서버에 요청 보내고 응답받기
 
-        // WebClient 통해서 ai 서버에 요청 보내고 응답받기
-        WebClient.create()
-                .post()
-                .uri(url)
+        // method: post
+        // url: http://127.0.0.1:10000/ess/optimal
+        // header: Content-Type APPLICATION_JSON
+        // body: EssSchRequestDto
+
+        RequestEntity<EssSchAiRequestDto> essRequestEntity = RequestEntity.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(essRequestJson))
-                .retrieve()
-                .bodyToMono(String.class)
-                .subscribe(essResponseBody -> {
-                    log.info("Response from AI Server: " + essResponseBody);
-                });
+                .body(essRequestDto);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<EssSchAiResponseDto> respEntity = restTemplate.exchange(essRequestEntity, EssSchAiResponseDto.class);
+
+        EssSchAiResponseDto essResponseDto = respEntity.getBody();
+        log.info("[AI 응답] " + essResponseDto); //
+        return essResponseDto;
+    }
+
+    private void sendJsonToClient(BuildingPerMinute bdConsumption) throws IOException {
+
+        EssSchFrontResponseDto essFrontResponse = createJsonToBeSent(bdConsumption);
+        log.info("[front 응답] " + essFrontResponse); //
+
+        for (Member member : memberRepository.findAll()) {
+
+            if (sseEmitters.containsKey(member.getId())) {
+
+                SseEmitter sseEmitter = sseEmitters.get(member.getId());
+                if (sseEmitter == null) {
+                    sseEmitter  = new SseEmitter();
+                    sseEmitters.put(member.getId(), sseEmitter);
+                }
+
+                sseEmitter.send(SseEmitter.event()
+                        .name("essBatteryScheduling")
+                        .data(essFrontResponse));
+            }
+        }
+    }
+
+    private EssSchFrontResponseDto createJsonToBeSent(BuildingPerMinute bdConsumption) {
+
+        String timestamp = getTimestamp();
+        int consumption = sumConsumption(bdConsumption);
+
+        Graph1 graph1 = Graph1.builder()
+                .timestamp(timestamp)
+                .batteryPower(essResponseDto.getBatteryPower())
+                .consumption(consumption)
+                .tou(essResponseDto.getTou())
+                .build();
+
+        Graph2 graph2 = Graph2.builder()
+                .timestamp(timestamp)
+                .consumption(consumption)
+                .netLoad(essResponseDto.getNetLoad())
+                .threshold(essResponseDto.getThreshold())
+                .build();
+
+        Graph3 graph3 = Graph3.builder()
+                .timestamp(timestamp)
+                .soc(essResponseDto.getSoc())
+                .build();
+
+        return EssSchFrontResponseDto.builder()
+                .graph1(graph1)
+                .graph2(graph2)
+                .graph3(graph3)
+                .build();
+    }
+
+    private String getTimestamp() {
+        return essResponseDto.getTimestamp();
+    }
+
+    private int sumConsumption(BuildingPerMinute bdConsumption) {
+        return (int) (bdConsumption.getA_Consumption() + bdConsumption.getB_Consumption() + bdConsumption.getC_Consumption());
     }
 }
