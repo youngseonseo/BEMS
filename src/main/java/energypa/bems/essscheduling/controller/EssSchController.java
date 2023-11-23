@@ -1,8 +1,7 @@
 package energypa.bems.essscheduling.controller;
 
-import energypa.bems.energy.domain.BuildingPerTenMinute;
+import energypa.bems.essscheduling.dto.front.EssSchFrontResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +25,7 @@ public class EssSchController {
             @ApiResponse(
                     responseCode = "200",
                     description = "ESS battery scheduling 모니터링 요청 성공",
-                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = BuildingPerTenMinute.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssSchFrontResponseDto.class))
             )
     })
     @GetMapping
