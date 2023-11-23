@@ -2,10 +2,12 @@ package energypa.bems.monitoring.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.sql.Date;
 
 @AllArgsConstructor
+@Getter
 public class EachConsumption {
 
     @Schema(description = "yesterday or week before or month before", example = "2022-08-03")

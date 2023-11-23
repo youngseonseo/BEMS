@@ -1,6 +1,6 @@
 import { BigNavcoupon, BigNavsetting } from "./navbarStyle";
 
-import { NavContainer, BigNavBill } from "./userNavbarStyle";
+import { NavContainer, BigNavBill, BigNavManage } from "./userNavbarStyle";
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,9 @@ export default function UserNavigationBar(props) {
   const onclicksetting = () => {
     navigate("/main/user/setting");
   };
+  const onclickEnergyManagement = () => {
+    navigate("/main/user/energymanagement");
+  };
 
   return (
     <NavContainer>
@@ -27,6 +30,15 @@ export default function UserNavigationBar(props) {
         />
         고지서
       </BigNavBill>
+      <BigNavManage name={props.name} onClick={onclickEnergyManagement}>
+        <img
+          src="/image/monitoring.svg"
+          width={"25px"}
+          height={"25px"}
+          alt="energy_management"
+        />
+        에너지 관리
+      </BigNavManage>
 
       <BigNavcoupon name={props.name} onClick={onclickcoupon}>
         <img
