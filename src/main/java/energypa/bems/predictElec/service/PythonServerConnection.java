@@ -1,7 +1,8 @@
 package energypa.bems.predictElec.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import energypa.bems.energy.domain.FloorOneHour;
+import energypa.bems.ess.domain.EssPredictResult;
+import energypa.bems.ess.dto.EssPredictRequestDto;
 import energypa.bems.predictElec.dto.RequestElecDto;
 import energypa.bems.predictElec.dto.ReturnElecDto;
 import lombok.RequiredArgsConstructor;
@@ -91,6 +92,70 @@ public class PythonServerConnection {
         return null;
     }
 
+
+    public EssPredictResult PredictESS(EssPredictRequestDto essPredictRequestDto) throws IOException {
+
+        try {
+            // 파이썬 AI 서버의 URL
+            String pythonServerUrl = "http://127.0.0.1:10000/ess/optimal";
+            URL requestURL = new URL(pythonServerUrl);   // 쿼리문 완성
+            HttpURLConnection connection = (HttpURLConnection) requestURL.openConnection();
+
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-type", "application/json");
+            connection.setDoOutput(true);
+            connection.setConnectTimeout(5000); //연결제한 시간 설정. 5초 간 연결시도
+            connection.setDoInput(true);
+
+            try (DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());) {
+
+
+                // RequestBody 동적으로 구성
+                ObjectMapper objectMapper = new ObjectMapper();
+                String requestBody = objectMapper.writeValueAsString(essPredictRequestDto);
+
+                // RequestBody 전송
+                try (OutputStream os = connection.getOutputStream();
+                     OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8")) {
+                    osw.write(requestBody);
+                    osw.flush();
+                }
+
+                // 응답(Response) 구조 작성
+                // Stream -> JSONObject
+                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                String readline;
+                Double predictValue;
+                StringBuilder response = new StringBuilder();
+                while ((readline = br.readLine()) != null) {
+                    response.append(readline);
+                }
+
+
+                br.close();
+                connection.disconnect();
+
+                // JSON 객체로  변환
+                Map<String, Object> map = objectMapper.readValue(response.toString(),  new TypeReference<Map<String,Object>>(){});
+
+
+                Double soc = Double.valueOf(String.valueOf(map.get("SOC")));
+                Double batteryPower = Double.valueOf(String.valueOf(map.get("BATTERY_POWER")));
+                Double predicted_consumption = Double.valueOf(String.valueOf(map.get("PREDICTED_CONSUMPTION")));
+                Double tou = Double.valueOf(String.valueOf(map.get("TOU(원/kWh)")));
+                Double threshold = Double.valueOf(String.valueOf(map.get("THRESHOLD")));
+                Double net_load = Double.valueOf(String.valueOf(map.get("NET_LOAD")));
+
+                return new EssPredictResult(essPredictRequestDto.getTimestamp(), soc, batteryPower, predicted_consumption, tou, threshold, net_load);
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 
 

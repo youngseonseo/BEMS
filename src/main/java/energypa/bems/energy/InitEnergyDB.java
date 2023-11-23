@@ -3,6 +3,9 @@ package energypa.bems.energy;
 import energypa.bems.energy.domain.*;
 import energypa.bems.energy.repository.*;
 import energypa.bems.energy.service.CsvReadService;
+import energypa.bems.ess.EssPredictResultRepository;
+import energypa.bems.ess.domain.EssPredictResult;
+import energypa.bems.ess.dto.EssPredictRequestDto;
 import energypa.bems.predictElec.dto.RequestElecDto;
 import energypa.bems.predictElec.dto.ReturnElecDto;
 import energypa.bems.predictElec.service.PythonServerConnection;
@@ -29,10 +32,11 @@ public class InitEnergyDB {
     private final TotalOneHourPredictRepository totalOneHourPredictRepository;
     private final PythonServerConnection pythonServerConnection;
     private final TotalOneHourRepository totalOneHourRepository;
+    private final EssPredictResultRepository essPredictResultRepository;
     CsvReadService csvReadService = new CsvReadService();
 
 
-//    @PostConstruct
+    @PostConstruct
     public void init() throws IOException {
 
 
@@ -59,6 +63,9 @@ public class InitEnergyDB {
 
         buildingEnergyPriceInit();             // 전력 요금 저장
         log.info("buildingEnergyPrice init completed");
+
+        essPredictInit();                      // ESS 예측치 저장
+        log.info("ESS Predict init completed");
 
 
     }
@@ -146,6 +153,27 @@ public class InitEnergyDB {
             TotalOneHourPredict totalOneHourPredict = new TotalOneHourPredict(betweenEndDt, totalConsumption);
             totalOneHourPredictRepository.save(totalOneHourPredict);
             betweenEndDt = new Timestamp(betweenEndDt.getYear(),betweenEndDt.getMonth(),betweenEndDt.getDate(), betweenEndDt.getHours()+1,betweenEndDt.getMinutes(),betweenEndDt.getSeconds(), betweenEndDt.getNanos());
+        }
+    }
+
+
+    public void essPredictInit() throws IOException {                       // ESS 예측치 저장
+        if(essPredictResultRepository.findById(2000L).isPresent()){
+            return;
+        }
+        List<BuildingPerMinute> all = buildingPerMinuteRepository.findAll();
+        Double soc = 50.0;
+        Double batteryPower = 0.0;
+        int i=1;
+        for (BuildingPerMinute buildingPerMinute : all) {
+            if(i<100)
+                continue;
+            EssPredictRequestDto essPredictRequestDto = new EssPredictRequestDto(buildingPerMinute.getTimestamp(), soc, batteryPower, buildingPerMinute.getA_Consumption(), buildingPerMinute.getB_Consumption(), buildingPerMinute.getC_Consumption());
+            EssPredictResult essPredictResult = pythonServerConnection.PredictESS(essPredictRequestDto);
+            essPredictResultRepository.save(essPredictResult);
+            soc = essPredictResult.getSoc();
+            batteryPower = essPredictResult.getBatteryPower();
+            i+=1;
         }
     }
 
