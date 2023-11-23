@@ -2,9 +2,9 @@ package energypa.bems.essscheduling.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @Builder
 public class EssSchRequestDto {
 

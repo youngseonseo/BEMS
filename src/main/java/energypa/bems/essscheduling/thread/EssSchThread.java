@@ -21,8 +21,9 @@ public class EssSchThread implements Runnable {
 
     private final BuildingPerMinuteRepository buildingRepository;
 
-    private long buildingPerMinuteId = 1l;
+    private long buildingPerMinuteId = 0l;
     private boolean isRunning = true;
+    private EssSchResponseDto essResponseDto = null;
 
     @Override
     public void run() {
@@ -34,7 +35,7 @@ public class EssSchThread implements Runnable {
                 BuildingPerMinute bdConsumption = getBdConsumptionFromDb();
 
                 // AI 서버에 요청 보내고 응답받기
-                 workWithAIServer(bdConsumption);
+                essResponseDto = workWithAIServer(essResponseDto, bdConsumption);
 
                 // 클라이언트에게 json 전달
 
@@ -57,7 +58,7 @@ public class EssSchThread implements Runnable {
 
     private BuildingPerMinute getBdConsumptionFromDb() throws IllegalStateException {
 
-        Optional<BuildingPerMinute> bdConsumptionOp = buildingRepository.findById(buildingPerMinuteId++);
+        Optional<BuildingPerMinute> bdConsumptionOp = buildingRepository.findById(buildingPerMinuteId);
 
         // DB(BuildingPerMinute) 데이터를 모두 조회한 경우 - ESS battery scheduling 모니터링 종료
         if (bdConsumptionOp.isEmpty()) {
@@ -67,20 +68,28 @@ public class EssSchThread implements Runnable {
         return bdConsumptionOp.get();
     }
 
-    private void workWithAIServer(BuildingPerMinute bdConsumption) throws URISyntaxException {
+    private EssSchResponseDto workWithAIServer(EssSchResponseDto essSchResponseDto, BuildingPerMinute bdConsumption) throws URISyntaxException {
 
         // 요청 보낼 ai 서버의 URL
         URI url = new URI("http://127.0.0.1:10000/ess/optimal");
 
         // 전달할 json 데이터
+        double soc = 50.0;
+        double batteryPower = 0.0;
+        if (buildingPerMinuteId++ > 1l) {
+            soc = essSchResponseDto.getSoc();
+            batteryPower = essSchResponseDto.getBatteryPower();
+        }
+
         EssSchRequestDto essRequestDto = EssSchRequestDto.builder()
                 .timestamp(bdConsumption.getTimestamp().toString())
-                .soc(50.0)
-                .batteryPower(0.0)
+                .soc(soc)
+                .batteryPower(batteryPower)
                 .consumptionOf561(bdConsumption.getA_Consumption())
                 .consumptionOf562(bdConsumption.getB_Consumption())
                 .consumptionOf563(bdConsumption.getC_Consumption())
                 .build();
+        log.info("[요청] essRequestDto: " + essRequestDto); //
 
         // RestTemplate 통해서 ai 서버에 요청 보내고 응답받기
 
@@ -97,6 +106,7 @@ public class EssSchThread implements Runnable {
         ResponseEntity<EssSchResponseDto> respEntity = restTemplate.exchange(essRequestEntity, EssSchResponseDto.class);
 
         EssSchResponseDto essResponseDto = respEntity.getBody();
-        System.out.println("essResponseDto: " + essResponseDto);
+        log.info("[응답] essResponseDto: " + essResponseDto); //
+        return essResponseDto;
     }
 }
