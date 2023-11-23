@@ -23,4 +23,17 @@ public interface TotalOneHourRepository extends JpaRepository<TotalOneHour, Long
     List<Object[]> getPrevBuildingConsumption(@Param("now") Timestamp now);
 
 
+    // 전날 전력 사용량
+    @Query(
+            value = "select sum(bpm.consumption) from TotalOneHour bpm where date(bpm.timestamp) = :yesterday",
+            nativeQuery = true
+    )
+    Double getYesterdayConsumption(@Param("yesterday") String yesterday);
+
+
+    // 오늘 하루 지금 시간까지의 전력 사용량
+    @Query(value = "select sum(consumption) from TotalOneHour m where m.timestamp between :startDt and :endDt", nativeQuery = true)
+    Double getFromNowConsumption(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt);
+
+
 }

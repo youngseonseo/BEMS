@@ -54,9 +54,10 @@ public class NotificationService {
         return notification;
     }
 
-    public void serverSendNotification() {    // 서버용 알림 보내기
-
-        SendNotificationDto sendNotificationDto = new SendNotificationDto("전력치 이상 경고 발생", "전력치 이상이 발생하였습니다. 궁금한 점은 시스템 관리자에게 문의하십시오.");
+    public void serverSendNotification(Integer num) {    // 서버용 알림 보내기
+        String title = String.format("%d%% 전력 사용", num);
+        String message = String.format("전일 대비 %d%% 전력을 사용하였습니다. 알림을 확인해보세요", num);
+        SendNotificationDto sendNotificationDto = new SendNotificationDto(title, message);
         List<Member> members = memberRepository.findAllByAuthority(Authority.MANAGER);
         System.out.println("members = " + members);
         for (Member member : members) {
