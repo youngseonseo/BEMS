@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
-    List<Coupon> findByReceiverAndUsedYn(Member member, boolean usedYn);
+    @Query("select cp from Coupon cp where cp.receiver.id = :memberId and cp.dDay >=0 and cp.usedYn = false")
+    List<Coupon> getCoupons(@Param("memberId") long memberId);
 
     @Query("select count(cp) from Coupon cp where cp.receiver = :receiver and cp.usedYn = :usedYn")
     int getNumOfCoupons(@Param("receiver") Member receiver, @Param("usedYn") boolean usedYn);
