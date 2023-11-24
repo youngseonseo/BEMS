@@ -33,8 +33,8 @@ public class UsageNotificationService {
         LocalDateTime todayDate = monitoringService.manipulateNowForBuilding();
         return todayDate.toLocalDate().minusDays(1L).toString();
     }
-    @Scheduled(cron = "0 * * * * ?")
-//    @Scheduled(cron = "0 0,10,20,30,40,50 * * * *")
+//    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0,10,20,30,40,50 * * * *")
     public void usageAlertService(){
 
         Double yesterdayConsumption = totalOneHourRepository.getYesterdayConsumption(getYesterday());
