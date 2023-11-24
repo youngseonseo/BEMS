@@ -11,4 +11,10 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     @Query("select cp from Coupon cp where cp.receiver.id = :memberId and cp.dDay >=0 and cp.usedYn = false")
     List<Coupon> getCoupons(@Param("memberId") long memberId);
+
+    @Query(value = "select mem.member_id, mem.building, mem.floor " +
+            "from (select member_id from Coupon where d_day >=0 and used_yn = 0 group by member_id) as memWithValidCoupon inner join Member as mem " +
+            "on memWithValidCoupon.member_id = mem.member_id",
+            nativeQuery = true)
+    List<Object[]> getUserWithCoupon();
 }
