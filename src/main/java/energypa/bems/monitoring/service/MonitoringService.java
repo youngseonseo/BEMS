@@ -100,7 +100,7 @@ public class MonitoringService {
         LocalDateTime now = LocalDateTime.now();
         now = now.minusYears(0L);
         now = now.minusMonths(3L);
-        return now.minusDays(3L).withMinute(0).withSecond(0).withNano(0);
+        return now.minusDays(6L).withMinute(0).withSecond(0).withNano(0);
     }
     public LocalDateTime manipulateNowForBuildingforGraph2() {
 
