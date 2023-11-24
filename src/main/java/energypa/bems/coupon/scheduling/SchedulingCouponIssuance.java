@@ -54,7 +54,7 @@ public class SchedulingCouponIssuance {
                 } catch (IllegalStateException e) {
                     log.info(building + "동 " + floor + "층은 존재하지 않습니다!");
                 } catch (NullPointerException e) {
-                    log.info("2달 전 전력 사용량 데이터가 존재하지 않아 비교 연산을 수행할 수 없습니다!");
+                    log.info("이전 전력 사용량 데이터가 존재하지 않습니다. 쿠폰 발급이 불가한 조건입니다!");
                 }
             }
         }
