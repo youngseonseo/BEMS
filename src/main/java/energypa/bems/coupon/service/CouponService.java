@@ -19,8 +19,4 @@ public class CouponService {
     public List<Coupon> getCoupons(Member member) {
         return couponRepository.getCoupons(member.getId());
     }
-
-    public int getNumOfCoupons(Member member) {
-        return couponRepository.getNumOfCoupons(member,false);
-    }
 }

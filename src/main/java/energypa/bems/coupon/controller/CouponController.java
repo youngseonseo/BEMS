@@ -43,7 +43,7 @@ public class CouponController {
         Member member = memberRepository.findById(userPrincipal.getId()).get();
 
         List<Coupon> couponList = couponService.getCoupons(member);
-        int numOfCoupons = couponService.getNumOfCoupons(member);
+        int numOfCoupons = couponList.size();
 
         return CouponResponse.builder()
                 .myCoupons(couponList)
