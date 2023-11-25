@@ -10,6 +10,7 @@ import {
   Graph2Cont,
   BackGround,
   TextCont,
+  ButtonPost,
 } from "./FloorbillStyle";
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -17,7 +18,7 @@ export default function FloorBillEnergyPage() {
   const [time, setTime] = useState("");
   const [consumption, setConsumption] = useState([]);
   const [price, setPrice] = useState([]);
-
+  const moment = require("moment");
   const token = localStorage.getItem("accessToken");
   const getBill = async () => {
     await axios
@@ -76,15 +77,21 @@ export default function FloorBillEnergyPage() {
         <UserNavigationBar name="bill" />
 
         <BillCont>
-          <div style={{ fontSize: "20px" }}>
+          <div
+            style={{
+              fontSize: "23px",
+              padding: "0px 0px 40px 0px",
+              fontWeight: "Bold",
+            }}
+          >
             현재까지 쓴 이번달 전기 요금은 {price[2]?.toLocaleString()}원
             입니다.
           </div>
           <TextCont>
             <div> 3달 간 전력 사용량 </div>
             <div>
-              <button onClick={getBill}>return</button>
-              {time}
+              {moment(time).format("YYYY-MM-DD HH시 mm분") + " 기준  "}
+              <ButtonPost onClick={getBill}>Check</ButtonPost>
             </div>
           </TextCont>
           <GraphCont>
@@ -96,14 +103,10 @@ export default function FloorBillEnergyPage() {
                 data={PriceData}
                 margin={{ top: 20, bottom: 20, left: 25 }}
               >
+                <Tooltip />
                 <XAxis dataKey="date" stroke="white" />
                 <YAxis stroke="white" tickFormatter={formatYAxis} />
-                <Bar
-                  dataKey="elec_price"
-                  fill="#8884d8"
-                  barSize={40}
-                  label={{ position: "top" }}
-                />
+                <Bar dataKey="elec_price" fill="#8884d8" barSize={40} />
               </BarChart>
             </Graph1Cont>
             <Graph2Cont>
@@ -116,12 +119,8 @@ export default function FloorBillEnergyPage() {
               >
                 <XAxis dataKey="date" stroke="white" />
                 <YAxis stroke="white" tickFormatter={formatYAxis} />
-                <Bar
-                  dataKey="elec_consumtion"
-                  fill="#f7d954"
-                  barSize={40}
-                  label={{ position: "top" }}
-                />
+                <Tooltip />
+                <Bar dataKey="elec_consumtion" fill="#f7d954" barSize={40} />
               </BarChart>
             </Graph2Cont>
           </GraphCont>

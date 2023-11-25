@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import React from "react";
 import {
+  ComposedChart,
   BarChart,
   Bar,
   AreaChart,
@@ -78,6 +79,7 @@ export default function EnergyConsumptionMonitoring() {
       });
     }
   };
+  console.log(data1);
   const onChangeDuration = (e) => {
     setGhDuration(e.target.value);
   };
@@ -114,7 +116,7 @@ export default function EnergyConsumptionMonitoring() {
           <GraphContainer>
             <Graph1>
               <div>전체 전력 소비량/예측량</div>
-              <AreaChart
+              <ComposedChart
                 width={1100}
                 height={300}
                 data={data1}
@@ -133,9 +135,10 @@ export default function EnergyConsumptionMonitoring() {
                 <XAxis
                   dataKey="timestamp"
                   tickFormatter={formatXAxisGraph1}
-                  interval={1440}
+                  interval={24}
                 />
                 <Label value="date" position="insideBottom" />
+                <Legend />
                 <YAxis
                   label={{
                     value: "kW",
@@ -151,7 +154,15 @@ export default function EnergyConsumptionMonitoring() {
                   stroke="#8884d8"
                   fill="#8884d8"
                 />
-              </AreaChart>
+
+                <Line
+                  name="총 전력 예측량"
+                  type="monotone"
+                  dataKey="totalPredictConsumption"
+                  stroke="red"
+                  fill="gray"
+                />
+              </ComposedChart>
             </Graph1>
             <DurationSelect>
               기간 설정

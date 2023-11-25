@@ -17,6 +17,25 @@ export const BigNavmonitoring = styled.button`
     border: 3px solid black;
   }
 `;
+export const BigNavBuildingManagement = styled.button`
+  width: 200px;
+  height: 50px;
+  border-radius: 4px;
+  border: ${(props) =>
+    props.name === "buildingmanagement" ? "3px solid white" : "#545454"};
+  color: black;
+  font-size: 18px;
+  background: ${(props) =>
+    props.name === "buildingmanagement" ? "#c2c4c3" : "#545454"};
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 0px 10px;
+  gap: 8px;
+  &:hover {
+    border: 3px solid black;
+  }
+`;
 export const BigNavcoupon = styled.button`
   width: 200px;
   height: 50px;
@@ -93,7 +112,7 @@ export const BigNavnotifying = styled.button`
 
 export const NavContainer = styled.div`
   width: 230px;
-  height: 500px;
+  height: 550px;
   border-radius: 10px;
   background-color: #6a6b6a;
   display: flex;

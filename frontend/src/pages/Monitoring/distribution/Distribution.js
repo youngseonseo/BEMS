@@ -7,7 +7,6 @@ import {
   BackGround,
   BuildingLight,
   Buildingcontainer,
-  BatteryImage,
   BoxLine1_a,
   BoxLine1_b,
   BoxLine1_c,
@@ -21,6 +20,7 @@ import {
   Building,
   TextBus1,
   TextBus2,
+  ElectricImg,
 } from "./DistributionStyle";
 
 export default function ElectricDistributionPage({ isopened }) {
@@ -33,7 +33,7 @@ export default function ElectricDistributionPage({ isopened }) {
 
     if (token != null) {
       console.log("SSE ", token);
-      let eventSource = new EventSourcePolyfill(subscribeUrl, {
+      let eventSource2 = new EventSourcePolyfill(subscribeUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "text/event-stream",
@@ -42,19 +42,19 @@ export default function ElectricDistributionPage({ isopened }) {
         withCredentials: true,
       });
 
-      eventSource.onopen = (event) => {
+      eventSource2.onopen = (event) => {
         console.log("this is opened", event);
       };
-      eventSource.addEventListener("ess", (event) => {
+      eventSource2.addEventListener("ess", (event) => {
         const json = JSON.parse(event.data);
 
         setAbus(json.a_bus);
         setBbus(json.b_bus);
         setCbus(json.c_bus);
       });
-      eventSource.addEventListener("error", (e) => {
+      eventSource2.addEventListener("error", (e) => {
         console.log("An error occurred while attempting to connect.");
-        eventSource.close();
+        eventSource2.close();
       });
     }
   };
@@ -80,6 +80,10 @@ export default function ElectricDistributionPage({ isopened }) {
         <DistBack>
           <TextBus1>BUS1</TextBus1>
           <Buildingcontainer>
+            <ElectricImg>
+              <img src="/image/Electric-bus.png" width={"150px"} />
+              <img src="/image/Electric-bus.png" width={"150px"} />
+            </ElectricImg>
             <Building>
               <BoxLine1_a bus={a_bus}></BoxLine1_a>
               <BuildingLight bus={a_bus}>

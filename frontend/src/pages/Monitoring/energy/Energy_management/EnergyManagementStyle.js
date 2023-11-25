@@ -15,12 +15,12 @@ export const MangementBackground = styled.div`
   width: 70vw;
   color: white;
   padding: 20px;
-  gap: 20px;
+  gap: 15px;
 `;
 export const Subtitle = styled.div`
-  font-size: 19px;
+  font-size: 18px;
   font-weight: bold;
-  padding: 10px;
+  padding: 5px;
 `;
 
 export const ConsumptionPattern = styled.div`
@@ -38,7 +38,7 @@ export const ConsumptionPattern2 = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 400px;
+  height: 300px;
   width: auto;
   color: white;
   padding: 10px;
@@ -57,7 +57,7 @@ export const TextPattern = styled.div`
   flex-direction: column;
   align-items: center;
   font-size: 20px;
-  width: 400px;
+  width: 350px;
   color: white;
 `;
 
@@ -65,12 +65,13 @@ export const BatterySave = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  align-items: center;
   background-color: #353535;
   padding: 20px;
   border-radius: 10px;
-  gap: 25px;
-  width: 450px;
-  height: 350px;
+  gap: 10px;
+  width: 320px;
+  height: 280px;
   color: white;
 `;
 export const CompareCost = styled.div`
@@ -82,22 +83,22 @@ export const CompareCost = styled.div`
   padding: 20px;
   border-radius: 10px;
   gap: 5px;
-  width: 500px;
-  height: 350px;
+  width: 650px;
+  height: 280px;
   color: white;
 `;
 export const SaveBox = styled.div`
   background-color: white;
   color: black;
   border-radius: 10px;
-  width: 270px;
-  height: 50px;
+  width: 250px;
+  height: 40px;
   font-size: 25px;
   font-weight: bold;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  margin: 0 auto;
+  padding: 0px 30px;
 `;
 export const ColorChart = styled.div`
   background: rgb(54, 144, 69);
@@ -149,12 +150,12 @@ export const ImageRotate = styled.img`
 `;
 export const TextPercent = styled.div`
   background-color: white;
-  padding: 20px;
+  padding: 5px;
   color: black;
   border-radius: 10px;
   width: 330x;
   height: 100px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: bold;
   display: flex;
   justify-content: center;

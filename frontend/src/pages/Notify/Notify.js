@@ -1,6 +1,6 @@
 import NavigationBar from "../../components/NavBar/navbar";
 import MainHeader from "../../components/MainHeader/header";
-import { BackGround } from "./../Monitoring/distribution/DistributionStyle";
+import { BackGround } from "./../Monitoring/energy/EnergyStyle";
 import {
   NotiContainer,
   NotiTitle,
