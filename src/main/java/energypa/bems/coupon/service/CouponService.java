@@ -24,7 +24,7 @@ public class CouponService {
     public List<UserWithCouponDto> getUserWithCoupon() {
 
         return couponRepository.getUserWithCoupon().stream()
-                .map(row -> new UserWithCouponDto((Long) row[0],(Integer) row[1], (Integer) row[2]))
+                .map(row -> new UserWithCouponDto((Long) row[0], (String) row[1], (Integer) row[2], (Integer) row[3]))
                 .collect(Collectors.toList());
     }
 

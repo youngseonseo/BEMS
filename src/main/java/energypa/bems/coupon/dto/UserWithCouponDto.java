@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 public class UserWithCouponDto {
 
     @Schema(description = "유저 ID", example = "1")
-    private Long memberId;
+    private Long userId;
+
+    @Schema(description = "유저 이름", example = "유저1")
+    private String username;
 
     @Schema(description = "동", example = "561")
     private Integer building;
