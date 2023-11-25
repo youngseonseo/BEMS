@@ -1,6 +1,7 @@
 package energypa.bems.coupon.dto;
 
 import energypa.bems.coupon.entity.Coupon;
+import energypa.bems.login.domain.Authority;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,7 @@ public class CouponResponse {
 
     @Schema(description = "유저가 보유한 쿠폰 개수", example = "5")
     private Integer numOfCoupons;
+
+    @Schema(description = "쿠폰함 페이지를 요청한 대상", example = "USER")
+    private Authority whoRequested;
 }

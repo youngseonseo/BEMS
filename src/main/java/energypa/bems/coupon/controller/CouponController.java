@@ -4,6 +4,10 @@ import energypa.bems.coupon.dto.CouponResponse;
 import energypa.bems.coupon.dto.UserWithCouponDto;
 import energypa.bems.coupon.entity.Coupon;
 import energypa.bems.coupon.service.CouponService;
+import energypa.bems.login.config.security.token.CurrentUser;
+import energypa.bems.login.config.security.token.UserPrincipal;
+import energypa.bems.login.domain.Member;
+import energypa.bems.login.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +28,7 @@ import java.util.List;
 public class CouponController {
 
     private final CouponService couponService;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "유저 쿠폰 페이지 요청", description = "유저가 쿠폰 페이지 요청 또는 관리자가 유저의 쿠폰 페이지를 요청한 경우, 해당 유저가 보유한 모든 쿠폰을 보여줍니다.")
     @ApiResponses({
@@ -34,14 +39,16 @@ public class CouponController {
         )
     })
     @GetMapping("/users/{userId}")
-    public CouponResponse requestCoupons(@PathVariable("userId") long userId) {
+    public CouponResponse requestCoupons(@PathVariable("userId") long userId, @CurrentUser UserPrincipal userPrincipal) {
 
         List<Coupon> couponList = couponService.getCoupons(userId);
         int numOfCoupons = couponList.size();
+        Member member = memberRepository.findById(userPrincipal.getId()).get();
 
         return CouponResponse.builder()
                 .myCoupons(couponList)
                 .numOfCoupons(numOfCoupons)
+                .whoRequested(member.getAuthority())
                 .build();
     }
 
