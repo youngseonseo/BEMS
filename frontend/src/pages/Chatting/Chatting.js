@@ -8,32 +8,18 @@ import {
   SendButton,
 } from "./ChattingStyle";
 import { useEffect, useRef, useState } from "react";
-import stompjs from "stompjs";
+import * as StompJs from "@stomp/stompjs";
 import axios from "axios";
 
 export default function ChattingPage() {
   const [intoChatdata, setIntoChatdata] = useState();
-  const [message, setMessage] = useState("");
-  const [chatList, setChatList] = useState([]);
+  const [message, setMessage] = useState(""); //메세지 유저 및 내용
+  const [chatList, setChatList] = useState([]); //서버에서 받아온 내용
   const [senderinfo, setSenderinfo] = useState([]);
-
+  const stompClient = useRef({});
   const onChange = (event) => setMessage(event.target.value);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-  };
-
-  const onSubmitMessage = (event) => {
-    if (message === "") {
-      return;
-    }
-    event.preventDefault();
-    console.log(chatMsg);
-    console.log(event);
-    // '전송' 버튼에 이벤트 리스너 부착 - 데이터 발행(pub) 요청
-    stompClient.current.send(chatRoomURI, {}, JSON.stringify(chatMsg));
-  };
-
+  console.log(message);
   const accessToken = localStorage.getItem("accessToken");
   const intoChat = async () => {
     await axios
@@ -56,44 +42,58 @@ export default function ChattingPage() {
         setSenderinfo(res.data.information);
       });
   };
-  const stompEndPoint = "ws://localhost:8080/ws-stomp";
-  const uuid = "148b7e89-1cf7-4620-b9e2-f6121b7db0d1";
-  const chatRoomURI = "/pub/chatroom/" + uuid;
-  const chatMsg = {
-    chatRoom: {
-      roomId: uuid,
-    },
-    type: "TALK",
-    sender: {
-      id: senderinfo?.id,
-      username: senderinfo?.username,
-    },
-    content: message,
-    sentTime: new Date(),
-  };
-  console.log(chatMsg);
-  const stompClient = useRef(stompjs.over(new WebSocket(stompEndPoint)));
+
   useEffect(() => {
     getUserInfo();
     intoChat();
+    const stompEndPoint = "ws://localhost:8080/ws-stomp";
+    const chatRoomURI = "/pub/chatroom/148b7e89-1cf7-4620-b9e2-f6121b7db0d1";
+    const Stomp = StompJs.Stomp;
+    const socket = new WebSocket(stompEndPoint);
+    stompClient.current = Stomp.over(() => socket);
+    const uuid = "148b7e89-1cf7-4620-b9e2-f6121b7db0d1";
 
+    // 서버와의 연결이 성공한 경우(stomp 연결이 성공적으로 설정되었음)
     stompClient.current.connect({}, () => {
       console.log("STOMP 연결 성공!");
+
       // topic 구독 요청
       stompClient.current.subscribe("/sub/chatroom/" + uuid, (message) => {
         // 해당 topic에 채팅 메시지(데이터)가 publish된 경우
         const jsonData = message.body;
         console.log("Received JSON Data: ", jsonData);
       });
-      //Tell user name to the server 채팅방 입장 메세지
 
-      stompClient.current.send(chatRoomURI, {}, JSON.stringify(chatMsg));
+      //'전송' 버튼에 이벤트 리스너 부착 - 데이터 발행(pub) 요청
+      document
+        .getElementById("sendMessageButton")
+        .addEventListener("click", (event) => {
+          event.preventDefault();
+          const roomId = "148b7e89-1cf7-4620-b9e2-f6121b7db0d1";
+          const senderId = senderinfo.id;
+          const senderUsername = senderinfo.username;
+          const sentTime = new Date();
+          const chatMsg = {
+            chatRoom: {
+              roomId: roomId,
+            },
+            type: "TALK",
+            sender: {
+              id: senderId,
+              username: senderUsername,
+            },
+            content: message,
+            sentTime: sentTime,
+          };
+
+          console.log(chatMsg);
+          stompClient.current.send(chatRoomURI, {}, JSON.stringify(chatMsg));
+          setMessage("");
+        });
     });
-
-    return () => {
-      stompClient.current.disconnect();
-    };
+    return () => stompClient.current.disconnect();
   }, []);
+
   return (
     <div>
       <MainHeader />
@@ -102,14 +102,16 @@ export default function ChattingPage() {
         <ChattingContainer>
           <ChatChat></ChatChat>
           <ChatWhite>
-            <input
-              style={{ width: "60vw" }}
-              type="text"
-              placeholder="메세지를 입력하세요"
-              onChange={onChange}
-              value={message}
-            ></input>
-            <SendButton onSubmit={onSubmitMessage}>전송</SendButton>
+            <form>
+              <input
+                style={{ width: "60vw" }}
+                type="text"
+                placeholder="메세지를 입력하세요"
+                onChange={onChange}
+                value={message}
+              ></input>
+              <SendButton id="sendMessageButton">전송</SendButton>
+            </form>
           </ChatWhite>
         </ChattingContainer>
       </BackGround>

@@ -32,6 +32,18 @@ export const Buildingcontainer = styled.div`
   gap: 5vw;
   color: white;
 `;
+export const ElectricImg = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: center;
+  gap: 13.5vw;
+  color: white;
+  position: relative;
+  top: -3vh;
+  z-index: 10;
+  right: 5vw;
+`;
 
 export const BoxLine1_a = styled.div`
   width: 23vw;

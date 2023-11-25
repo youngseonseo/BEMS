@@ -1,7 +1,5 @@
-import { useParams } from "react-router-dom";
-import axios from "axios";
 import { useEffect, useState } from "react";
-import UserNavigationBar from "../../../../components/NavBar/userNavbar";
+import NavigationBar from "../../../../components/NavBar/navbar";
 import MainHeader from "../../../../components/MainHeader/header";
 import {
   BackGround,
@@ -22,19 +20,20 @@ import {
   TextPercent,
   Subtitle,
 } from "./EnergyManagementStyle";
-import { PieChart, Pie, Sector, Cell, Tooltip, Label } from "recharts";
 
-export default function EnergyManagementUserPage() {
+import axios from "axios";
+import { PieChart, Pie, Sector, Cell, Tooltip, Label } from "recharts";
+export default function BuildingEnergyManagementPage() {
   const [time, setTime] = useState("");
   const [consumption, setConsumption] = useState([]);
-  const [saveCost, setSaveCost] = useState([]);
-  const [compare, setCompare] = useState([]);
-  const moment = require("moment");
+  const [saveCost561, setSaveCost561] = useState([]);
+  const [saveCost562, setSaveCost562] = useState([]);
+  const [saveCost563, setSaveCost563] = useState([]);
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
   const token = localStorage.getItem("accessToken");
-  const getMangement = async () => {
+  const getBuildingMangement = async () => {
     await axios
-      .get("http://localhost:8080/api/energy/pattern", {
+      .get("http://localhost:8080/api/energy/pattern/building", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -45,8 +44,9 @@ export default function EnergyManagementUserPage() {
         console.log(res);
         setTime(res?.standardTimestamp);
         setConsumption(res?.energyConsumptionDto);
-        setSaveCost(res?.energySaveCostDto);
-        setCompare(res?.energyCompareDto);
+        setSaveCost561(res?.energySaveCostDto1);
+        setSaveCost562(res?.energySaveCostDto2);
+        setSaveCost563(res?.energySaveCostDto3);
       });
   };
   const RADIAN = Math.PI / 180;
@@ -133,15 +133,15 @@ export default function EnergyManagementUserPage() {
     { name: "심야", value: consumption.lateNightPercent },
   ];
   useEffect(() => {
-    getMangement();
+    getBuildingMangement();
   }, []);
   return (
     <div>
       <MainHeader />
       <BackGround>
-        <UserNavigationBar name="energy_management" />
+        <NavigationBar name="buildingmanagement" />
         <MangementBackground>
-          <Subtitle style={{ fontSize: "25px" }}>우리집 에너지 소비</Subtitle>
+          <Subtitle style={{ fontSize: "25px" }}>에너지 관리 현황</Subtitle>
 
           <Subtitle
             style={{
@@ -150,7 +150,7 @@ export default function EnergyManagementUserPage() {
               alignItems: "center",
             }}
           >
-            <div>에너지 소비패턴 분석(1일전)</div>
+            <div>전체동 에너지 소비패턴 분석(1일전)</div>
             <div style={{ fontSize: "15px" }}> {time} 기준</div>
           </Subtitle>
           <ConsumptionPattern>
@@ -193,69 +193,75 @@ export default function EnergyManagementUserPage() {
           </ConsumptionPattern>
           <ConsumptionPattern2>
             <div>
-              <Subtitle>우리집 ESS 배터리 이용 절약 요금</Subtitle>
-              <BatterySave style={{ width: "350px" }}>
+              <Subtitle>561동 절약 요금</Subtitle>
+              <BatterySave>
                 <div>
                   하루
                   <SaveBox>
-                    - {saveCost?.daySaveCost?.toLocaleString()}원
+                    - {saveCost561?.daySaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
+
                 <div>
                   일주일
                   <SaveBox>
-                    - {saveCost?.weekSaveCost?.toLocaleString()}원
+                    - {saveCost561?.weekSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
                 <div>
-                  이번달
+                  한달
                   <SaveBox>
-                    - {saveCost?.monthSaveCost?.toLocaleString()}원
+                    - {saveCost561?.monthSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
               </BatterySave>
             </div>
             <div>
-              <Subtitle>우리집 소비현황</Subtitle>
-              <CompareCost>
-                <AvgPosition>
-                  <div>아파트 평균</div>
-                  <div>({compare.buildingAverage}kW)</div>
-                </AvgPosition>
+              <Subtitle>562동 절약 요금</Subtitle>
+              <BatterySave>
+                <div>
+                  하루
+                  <SaveBox>
+                    - {saveCost562?.daySaveCost?.toLocaleString()}원
+                  </SaveBox>
+                </div>
 
-                <ColorChart>
-                  <Checker></Checker>
-                  <Checker></Checker>
-                  <Checker></Checker>
-                  <Checker></Checker>
-                  <Checker></Checker>
-                  <Checker></Checker>
-                </ColorChart>
-                <PercentText>
-                  <div>-60%</div>
-                  <div>-30%</div>
-                  <div>0%</div>
-                  <div>30%</div>
-                  <div>60%</div>
-                </PercentText>
-                <CheckPosition post={compare.compareAveragePercent}>
-                  <ImageRotate
-                    src="/image/arrow.png"
-                    width={"40px"}
-                    height={"25px"}
-                    alt="arrow"
-                  />
-                  <div>우리집 사용량</div>
-                  <div>({compare.floorAverage}kW)</div>
-                </CheckPosition>
-                <TextPercent>
-                  이번달 평균 ({compare.buildingAverage}kW)대비
-                  {compare.compareAveragePercent < 0
-                    ? ` ${compare.compareAveragePercent}% 더 적게 `
-                    : ` ${compare.compareAveragePercent}% 더 많이 `}
-                  사용하였습니다.
-                </TextPercent>
-              </CompareCost>
+                <div>
+                  일주일
+                  <SaveBox>
+                    - {saveCost562?.weekSaveCost?.toLocaleString()}원
+                  </SaveBox>
+                </div>
+                <div>
+                  한달
+                  <SaveBox>
+                    - {saveCost562?.monthSaveCost?.toLocaleString()}원
+                  </SaveBox>
+                </div>
+              </BatterySave>
+            </div>
+            <div>
+              <Subtitle>563동 절약 요금</Subtitle>
+              <BatterySave>
+                <div>
+                  하루
+                  <SaveBox>
+                    - {saveCost563?.daySaveCost?.toLocaleString()}원
+                  </SaveBox>
+                </div>
+                <div>
+                  일주일
+                  <SaveBox>
+                    - {saveCost563?.weekSaveCost?.toLocaleString()}원
+                  </SaveBox>
+                </div>
+                <div>
+                  한달
+                  <SaveBox>
+                    - {saveCost563?.monthSaveCost?.toLocaleString()}원
+                  </SaveBox>
+                </div>
+              </BatterySave>
             </div>
           </ConsumptionPattern2>
         </MangementBackground>

@@ -15,6 +15,7 @@ export const GraphCont = styled.div`
 export const TextCont = styled.div`
   width: 64vw;
   display: flex;
+  padding: 10px 0px;
   justify-content: space-between;
 `;
 export const Graph1Cont = styled.div`
@@ -42,9 +43,19 @@ export const BillCont = styled.div`
   height: 77vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
   align-items: center;
-  background-color: #353535;
   border-radius: 10px;
+  color: white;
+`;
+
+export const ButtonPost = styled.button`
+  width: 100px;
+  height: 25px;
+  background-color: black;
+  border-radius: 5px;
+  border: 2px solid white;
+  &:hover {
+    border: 3px solid gray;
+  }
   color: white;
 `;

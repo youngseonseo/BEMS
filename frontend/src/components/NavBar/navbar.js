@@ -9,6 +9,7 @@ import {
   BigNavchatting,
   BigNavsetting,
   BigNavnotifying,
+  BigNavBuildingManagement,
 } from "./navbarStyle";
 
 import { useNavigate } from "react-router-dom";
@@ -35,6 +36,9 @@ export default function NavigationBar(props) {
   };
   const onclicknotify = () => {
     navigate("/main/notify");
+  };
+  const onclickBuildingManagement = () => {
+    navigate("/main/buildingManagement");
   };
   return (
     <NavContainer>
@@ -79,7 +83,18 @@ export default function NavigationBar(props) {
           전력량분배
         </SmallNavelectronic>
       </SmallNavCont>
-
+      <BigNavBuildingManagement
+        name={props.name}
+        onClick={onclickBuildingManagement}
+      >
+        <img
+          src="/image/coupon.png"
+          width={"28px"}
+          height={"27px"}
+          alt="buildingManagement"
+        />
+        에너지 관리
+      </BigNavBuildingManagement>
       <BigNavcoupon name={props.name} onClick={onclickcoupon}>
         <img
           src="/image/coupon.png"

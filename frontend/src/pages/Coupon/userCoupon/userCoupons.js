@@ -7,6 +7,7 @@ import {
   PageBackground,
   Coupon,
   AllCoupons,
+  InfoOfCoupon,
 } from "./userCouponStyle";
 
 export default function UserCouponPage() {
@@ -33,11 +34,21 @@ export default function UserCouponPage() {
       <BackGround>
         <UserNavigationBar name="coupon" />
         <PageBackground>
+          <InfoOfCoupon>
+            <div>P3 쿠폰은 ------------------------------- 입니다.</div>
+            <div>P5 쿠폰은 ------------------------------- 입니다.</div>
+          </InfoOfCoupon>
+
           <AllCoupons>
             {coupons.map((cpn) => (
-              <Coupon>
-                <h1>{cpn.couponType}</h1>
-                <div>{cpn.expirationDate}</div>
+              <Coupon type={cpn.couponType}>
+                <h1 style={{ position: "relative", left: "10px" }}>
+                  {cpn.couponType}
+                </h1>
+                <div>
+                  <div>발급일 : {cpn.issueDate}</div>
+                  <div>유효기간 : {cpn.expirationDate}</div>
+                </div>
               </Coupon>
             ))}
           </AllCoupons>
