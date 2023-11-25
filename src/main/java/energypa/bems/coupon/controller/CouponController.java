@@ -16,9 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -65,5 +64,19 @@ public class CouponController {
     public List<UserWithCouponDto> requestUserWithCoupon() {
 
         return couponService.getUserWithCoupon();
+    }
+
+    @Operation(summary = "관리자 쿠폰 사용 완료 처리 요청", description = "관리자가 특정 쿠폰에 대해 사용 완료 처리 요청을 합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "쿠폰 사용 완료 처리 성공"
+            )
+    })
+    @PatchMapping("/{couponId}")
+    public ResponseEntity<Void> requestCompletionOfCouponUse(@PathVariable("couponId") long couponId) {
+
+        couponService.completeUseOfCoupon(couponId);
+        return ResponseEntity.noContent().build();
     }
 }

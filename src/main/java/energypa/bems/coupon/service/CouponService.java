@@ -28,4 +28,8 @@ public class CouponService {
                 .map(row -> new UserWithCouponDto((Long) row[0],(Integer) row[1], (Integer) row[2]))
                 .collect(Collectors.toList());
     }
+
+    public void completeUseOfCoupon(long couponId) {
+        couponRepository.updateUsedYnOfCoupon(couponId);
+    }
 }

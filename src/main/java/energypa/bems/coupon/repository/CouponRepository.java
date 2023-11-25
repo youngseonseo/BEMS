@@ -2,6 +2,7 @@ package energypa.bems.coupon.repository;
 
 import energypa.bems.coupon.entity.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,4 +18,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             "on memWithValidCoupon.member_id = mem.member_id",
             nativeQuery = true)
     List<Object[]> getUserWithCoupon();
+
+    @Modifying
+    @Query("update Coupon cp set cp.usedYn = true where cp.couponId = :couponId")
+    void updateUsedYnOfCoupon(@Param("couponId") long couponId);
 }
