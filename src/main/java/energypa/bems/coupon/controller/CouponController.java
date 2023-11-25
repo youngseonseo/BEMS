@@ -4,10 +4,6 @@ import energypa.bems.coupon.dto.CouponResponse;
 import energypa.bems.coupon.dto.UserWithCouponDto;
 import energypa.bems.coupon.entity.Coupon;
 import energypa.bems.coupon.service.CouponService;
-import energypa.bems.login.config.security.token.CurrentUser;
-import energypa.bems.login.config.security.token.UserPrincipal;
-import energypa.bems.login.domain.Member;
-import energypa.bems.login.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,9 +24,8 @@ import java.util.List;
 public class CouponController {
 
     private final CouponService couponService;
-    private final MemberRepository memberRepository;
 
-    @Operation(summary = "유저 쿠폰 페이지 요청", description = "유저가 쿠폰 페이지를 요청한 경우, 해당 유저가 보유한 모든 쿠폰을 보여줍니다.")
+    @Operation(summary = "유저 쿠폰 페이지 요청", description = "유저가 쿠폰 페이지 요청 또는 관리자가 유저의 쿠폰 페이지를 요청한 경우, 해당 유저가 보유한 모든 쿠폰을 보여줍니다.")
     @ApiResponses({
         @ApiResponse(
                 responseCode = "200",
@@ -38,12 +33,10 @@ public class CouponController {
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = CouponResponse.class))
         )
     })
-    @GetMapping("/user")
-    public CouponResponse requestCoupons(@CurrentUser UserPrincipal userPrincipal) {
+    @GetMapping("/users/{userId}")
+    public CouponResponse requestCoupons(@PathVariable("userId") long userId) {
 
-        Member member = memberRepository.findById(userPrincipal.getId()).get();
-
-        List<Coupon> couponList = couponService.getCoupons(member);
+        List<Coupon> couponList = couponService.getCoupons(userId);
         int numOfCoupons = couponList.size();
 
         return CouponResponse.builder()
@@ -60,7 +53,7 @@ public class CouponController {
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserWithCouponDto.class)))
             )
     })
-    @GetMapping("/manager")
+    @GetMapping("/managers")
     public List<UserWithCouponDto> requestUserWithCoupon() {
 
         return couponService.getUserWithCoupon();

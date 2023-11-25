@@ -3,7 +3,6 @@ package energypa.bems.coupon.service;
 import energypa.bems.coupon.dto.UserWithCouponDto;
 import energypa.bems.coupon.entity.Coupon;
 import energypa.bems.coupon.repository.CouponRepository;
-import energypa.bems.login.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +17,8 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
 
-    public List<Coupon> getCoupons(Member member) {
-        return couponRepository.getCoupons(member.getId());
+    public List<Coupon> getCoupons(long userId) {
+        return couponRepository.getCoupons(userId);
     }
 
     public List<UserWithCouponDto> getUserWithCoupon() {
