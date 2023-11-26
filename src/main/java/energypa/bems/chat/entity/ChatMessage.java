@@ -43,5 +43,5 @@ public class ChatMessage {
 
     @Schema(description = "채팅메시지 전송 시각", example = "")
     @Column(name = "sent_time")
-    private String sentTime; // 필드 타입 변경 필요
+    private String sentTime;
 }

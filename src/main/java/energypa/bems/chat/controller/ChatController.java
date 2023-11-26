@@ -17,12 +17,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -55,12 +56,23 @@ public class ChatController {
                     responseCode = "200",
                     description = "채팅방 입장 성공",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ChatMessage.class)))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "존재하지 않는 채팅방 입장 요청"
             )
     })
-    @GetMapping("/chat/enter")
-    public List<ChatMessage> enterChatRoom(@CurrentUser UserPrincipal userPrincipal) {
+    @GetMapping("/api/chatrooms/{roomId}")
+    public ResponseEntity<List<ChatMessage>> enterChatRoom(@PathVariable("roomId") String roomId, @CurrentUser UserPrincipal userPrincipal) {
 
-        return chatService.enterChatRoom(userPrincipal);
+        try {
+            List<ChatMessage> prevChatMsgs = chatService.enterChatRoom(roomId, userPrincipal);
+            return ResponseEntity.ok(prevChatMsgs);
+        }
+        catch (IllegalStateException e) {
+            log.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @MessageMapping("/chatroom/{roomId}")

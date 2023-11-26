@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,12 +31,17 @@ public class ChatService {
     private final ChatMessageRepository chatMsgRepository;
     private final SimpMessageSendingOperations messagingTemplate;
 
-    public List<ChatMessage> enterChatRoom(@CurrentUser UserPrincipal userPrincipal) {
+    public List<ChatMessage> enterChatRoom(String roomId, @CurrentUser UserPrincipal userPrincipal) throws IllegalStateException {
 
-        ChatRoom chatRoom = chatRoomRepository.findChatRoom();
+        Optional<ChatRoom> chatRoomOp = chatRoomRepository.findChatRoom(roomId);
+        if (chatRoomOp.isEmpty()) {
+            throw new IllegalStateException("아이디가 " + roomId + "인 채팅방은 존재하지 않습니다!");
+        }
+        ChatRoom chatRoom = chatRoomOp.get();
+
         Member member = memberRepository.findById(userPrincipal.getId()).get();
 
-        Optional<Matching> matchingYn = matchingRepository.findMatchingStatus(chatRoom.getRoomId(), member.getId());
+        Optional<Matching> matchingYn = matchingRepository.findByChatRoomAndMember(chatRoom, member);
 
         if (matchingYn.isEmpty()) { // 유저가 채팅방에 처음 입장한 경우
 
@@ -47,10 +51,10 @@ public class ChatService {
                     .build();
             matchingRepository.save(matching);
 
-            chatRoomRepository.updateCount(chatRoom.getRoomId());
+            chatRoomRepository.updateCount(roomId);
 
             String enterMsg = member.getUsername() + " 님이 방에 입장하였습니다";
-            messagingTemplate.convertAndSend("/sub/chatroom/" + chatRoom.getRoomId(), enterMsg);
+            messagingTemplate.convertAndSend("/sub/chatroom/" + chatRoom.getRoomId(), enterMsg); // 해당 채팅방에 존재하는 유저에게 입장메시지 뿌리기
 
             ChatMessage chatMessage = ChatMessage.builder()
                     .chatRoom(chatRoom)
@@ -61,19 +65,11 @@ public class ChatService {
                     .build();
             chatMsgRepository.save(chatMessage);
 
-            List<ChatMessage> chatMsgForSub = new ArrayList<>();
-            chatMsgForSub.add(
-                    ChatMessage.builder()
-                    .chatRoom(chatRoom)
-                    .build()
-            );
-            return chatMsgForSub;
+            return null;
 
         } else { // 유저가 채팅방에 재입장한 경우
-            return chatMsgRepository.getPrevChatMsgs(
-                    chatRoom.getRoomId(),
-                    member.getUsername() + " 님이 방에 입장하였습니다"
-            );
+            return chatMsgRepository.getPrevChatMsgs(chatRoom.getRoomId(),
+                    member.getUsername() + " 님이 방에 입장하였습니다");
         }
     }
 }
