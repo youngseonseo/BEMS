@@ -2,6 +2,7 @@ package energypa.bems.energy.repository;
 
 import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.ess.dto.BusDto;
+import energypa.bems.ess.dto.RateConsumptionDto;
 import energypa.bems.monitoring.dto.Graph1Dto;
 import energypa.bems.monitoring.dto.TotalConsumption;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,6 +49,13 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
             nativeQuery = true
     )
     List<Object[]> getPrevDailyConsumption(@Param("lastWeek") String lastWeek, @Param("yesterday") String yesterday);
+
+
+    // ESS 배터리 절약 요금 계산을 위한 query
+    @Query(
+            value = "select new energypa.bems.ess.dto.RateConsumptionDto(sum(bpm.A_Consumption), sum(bpm.B_Consumption), sum(bpm.C_Consumption)) from BuildingPerMinute bpm where bpm.timestamp>=:startDt and bpm.timestamp<=:endDt"
+    )
+    RateConsumptionDto getRateConsumption(@Param("startDt") Timestamp startDt, @Param("endDt") Timestamp endDt);
 
     /**
     @Query(
