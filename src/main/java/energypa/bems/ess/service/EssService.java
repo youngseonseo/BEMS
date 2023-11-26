@@ -40,7 +40,7 @@ public class EssService {
                         if(sseEmitter!=null) {
                             try {
                                 sseEmitter.send(SseEmitter.event().name("ess").data(bus));
-                                Thread.sleep(1000);
+                                Thread.sleep(5000);
                             } catch (Exception e) {
                                 sseEmitters.remove(member.getId());
                             }
