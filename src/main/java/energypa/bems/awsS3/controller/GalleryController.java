@@ -4,6 +4,10 @@ import java.util.List;
 import energypa.bems.awsS3.dto.GalleryDto;
 import energypa.bems.awsS3.service.GalleryService;
 import energypa.bems.awsS3.service.S3Service;
+import energypa.bems.login.config.security.token.CurrentUser;
+import energypa.bems.login.config.security.token.UserPrincipal;
+import energypa.bems.login.domain.Member;
+import energypa.bems.login.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,6 +34,7 @@ import static energypa.bems.awsS3.service.S3Service.CLOUD_FRONT_DOMAIN_NAME;
 public class GalleryController {
     private S3Service s3Service;
     private GalleryService galleryService;
+    private final MemberRepository memberRepository;
 
     @Operation(method = "get", summary = "모든 이미지 조회")
     @ApiResponses(value=
@@ -72,6 +77,21 @@ public class GalleryController {
     @DeleteMapping("/gallery/{galleryId}")
     public ResponseEntity<?> delete(@PathVariable Long galleryId){
         galleryService.delete(galleryId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(method="update", summary = "이미지 수정")
+    @ApiResponses(value=
+    @ApiResponse(responseCode = "200", description = "이미지 수정 성공")
+    )
+    @PutMapping("/gallery")
+    public ResponseEntity<?> delete(@CurrentUser UserPrincipal userPrincipal,@RequestPart(value="file",required = false)  MultipartFile file) throws IOException {
+        Member member = memberRepository.findById(userPrincipal.getId()).get();
+        GalleryDto galleryDto = new GalleryDto();
+        String imgPath = s3Service.upload(file);
+        galleryDto.setImgFullPath(CLOUD_FRONT_DOMAIN_NAME+"/"+imgPath);
+        String s = galleryService.saveMember(galleryDto);
+        memberRepository.updateImageUrl(member.getId(), s);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
