@@ -26,4 +26,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     int updateAuthority(@Param("id") Long id, @Param("authority") Authority authority);
 
     Member findByBuildingAndFloor(int building, int floor);
+
+
+    @Modifying
+    @Transactional
+    @Query("update Member m set m.imageUrl=:imageUrl where m.id=:id")
+    void updateImageUrl(@Param("id") Long id, @Param("imageUrl") String imageUrl);
 }
