@@ -65,8 +65,8 @@ public class CalculateService {
 
         // 이번 달 실시간 전력 요금 계산
         Integer consumptionByTimeStamp = buildingPerTenMinuteRepository.findConsumptionByTimestampAndBuildingAndFloor(startDt, betweenEndDt, user.getBuilding() ,user.getFloor());
-        priceList.add((int)(consumptionByTimeStamp * unitCost)/100);
-        costList.add((int)(consumptionByTimeStamp/100/60));
+        priceList.add((int)(consumptionByTimeStamp * unitCost)/100/60);
+        costList.add((int)(consumptionByTimeStamp/100));
 
         return new TotalCostDto(currentLocal,priceList,costList);
 
