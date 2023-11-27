@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static energypa.bems.notification.controller.NotificationController.sseEmitters;
 
@@ -33,12 +36,13 @@ import static energypa.bems.notification.controller.NotificationController.sseEm
 public class EssSchThread implements Runnable {
 
     private final BuildingPerMinuteRepository buildingRepository;
-    private final MemberRepository memberRepository;
     private final EssPredictResultRepository essRepository;
 
-    private long buildingPerMinuteId = 1l;
+    public static long buildingPerMinuteId = 1l;
     private boolean isRunning = true;
-    private EssSchAiResponseDto essResponseDto = null;
+//    private EssSchAiResponseDto essResponseDto = null;
+
+    public static Map<Long, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
 
     @Override
     public void run() {
@@ -146,20 +150,11 @@ public class EssSchThread implements Runnable {
         EssSchFrontResponseDto essFrontResponse = createJsonToBeSent(bdConsumption, aiDataFromDb);
         log.info("[front 응답] " + essFrontResponse); //
 
-        for (Member member : memberRepository.findAll()) {
+        for (SseEmitter sseEmitter : sseEmitters.values()) {
 
-            if (sseEmitters.containsKey(member.getId())) {
-
-                SseEmitter sseEmitter = sseEmitters.get(member.getId());
-                if (sseEmitter == null) {
-                    sseEmitter  = new SseEmitter();
-                    sseEmitters.put(member.getId(), sseEmitter);
-                }
-
-                sseEmitter.send(SseEmitter.event()
-                        .name("essBatteryScheduling")
-                        .data(essFrontResponse));
-            }
+            sseEmitter.send(SseEmitter.event()
+                    .name("essBatteryScheduling")
+                    .data(essFrontResponse));
         }
     }
 

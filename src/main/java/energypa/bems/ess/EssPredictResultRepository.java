@@ -12,6 +12,10 @@ import java.util.Optional;
 
 public interface EssPredictResultRepository extends JpaRepository<EssPredictResult, Long> {
 
+    @Query(value = "select * from EssPredictResult limit 50 offset :offset",
+           nativeQuery = true)
+    List<EssPredictResult> getEssSchPrevData(@Param("offset") long offset);
+
     @Query(value = "select * from EssPredictResult limit 1 offset :offset",
            nativeQuery = true)
     Optional<EssPredictResult> getAiResFromDb(@Param("offset") long offset);
