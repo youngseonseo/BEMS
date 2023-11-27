@@ -2,7 +2,6 @@ package energypa.bems.chat.controller;
 
 import energypa.bems.chat.entity.ChatMessage;
 import energypa.bems.chat.entity.ChatRoom;
-import energypa.bems.chat.repository.ChatMessageRepository;
 import energypa.bems.chat.repository.ChatRoomRepository;
 import energypa.bems.chat.service.ChatService;
 import energypa.bems.login.config.security.token.CurrentUser;
@@ -19,9 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +33,6 @@ public class ChatController {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
-    private final ChatMessageRepository chatMessageRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
 
     @PostConstruct
     public void init() {
@@ -73,15 +67,5 @@ public class ChatController {
             log.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    @MessageMapping("/chatroom/{roomId}")
-    public void sendChatMsgToSubscriber(@DestinationVariable("roomId") String roomId, ChatMessage chatMessage) {
-
-        log.info("chat '{}' send by '{}'", chatMessage.getContent(), chatMessage.getSender());
-
-        chatMessageRepository.save(chatMessage);
-
-        messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, chatMessage);
     }
 }
