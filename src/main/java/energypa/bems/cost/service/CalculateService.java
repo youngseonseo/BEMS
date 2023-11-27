@@ -50,7 +50,7 @@ public class CalculateService {
             Double ConsumptionAll = buildingEnergyPriceRepository.findByBuildingAndFloor(LocalDate.now().getMonthValue()-8+i,user.getBuilding(), user.getFloor());
 
             costList.add((int)(ConsumptionAll/100));    // kW기준 전력 사용량 저장
-            priceList.add((int)(ConsumptionAll * unitCost)/100);   // 원 기준 전력 요금 저장 -> 10분 단위와 kWh이므로 100을 나누어 주어야 함 (*10 /1000)
+            priceList.add((int)(ConsumptionAll * unitCost)/100/60);   // 원 기준 전력 요금 저장 -> 10분 단위와 kWh이므로 100을 나누어 주어야 함 (*10 /1000)
         }
 
 
@@ -66,7 +66,7 @@ public class CalculateService {
         // 이번 달 실시간 전력 요금 계산
         Integer consumptionByTimeStamp = buildingPerTenMinuteRepository.findConsumptionByTimestampAndBuildingAndFloor(startDt, betweenEndDt, user.getBuilding() ,user.getFloor());
         priceList.add((int)(consumptionByTimeStamp * unitCost)/100);
-        costList.add((int)(consumptionByTimeStamp/100));
+        costList.add((int)(consumptionByTimeStamp/100/60));
 
         return new TotalCostDto(currentLocal,priceList,costList);
 
