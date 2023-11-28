@@ -10,6 +10,7 @@ import energypa.bems.login.config.security.token.UserPrincipal;
 import energypa.bems.login.domain.Member;
 import energypa.bems.login.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +20,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,23 +53,24 @@ public class EssSchController {
             @ApiResponse(
                     responseCode = "200",
                     description = "ESS battery scheduling 모니터링 요청 성공",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssSchFrontResponseDto.class))
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EssSchFrontResponseDto.class)))
             )
     })
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public void monitorEss(@CurrentUser UserPrincipal userPrincipal) {
+    public ResponseEntity<SseEmitter> monitorEss(@CurrentUser UserPrincipal userPrincipal) {
 
         Member member = memberRepository.findById(userPrincipal.getId()).get();
         long memberId = member.getId();
 
         SseEmitter sseEmitter = EssSchThread.sseEmitters.get(memberId);
         if (sseEmitter == null) {
-            sseEmitter = new SseEmitter();
+            sseEmitter = new SseEmitter(60*60*1000l);
             EssSchThread.sseEmitters.put(memberId, sseEmitter);
         }
 
         List<EssPredictResult> essSchPrevData = essRepository.getEssSchPrevData(EssSchThread.buildingPerMinuteId);
-        log.info("[prevData] " + essSchPrevData);
+        EssSchThread.buildingPerMinuteId += 500;
+        log.info("[ESS prevData] " + essSchPrevData); //
         try {
             sseEmitter.send(SseEmitter.event()
                     .name("getEssSchPrevData")
@@ -75,6 +78,9 @@ public class EssSchController {
         }
         catch (IOException E) {
             log.info("SSE 연결에 오류가 발생해 ESS 배터리 스케줄링 데이터 전송에 실패하였습니다!");
+            // 애플리케이션 관리자에게 알림 주는 코드
         }
+
+        return ResponseEntity.ok(sseEmitter);
     }
 }
