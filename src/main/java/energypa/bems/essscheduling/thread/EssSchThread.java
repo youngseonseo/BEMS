@@ -10,6 +10,7 @@ import energypa.bems.essscheduling.dto.front.EssSchFrontResponseDto;
 import energypa.bems.essscheduling.dto.front.Graph1;
 import energypa.bems.essscheduling.dto.front.Graph2;
 import energypa.bems.essscheduling.dto.front.Graph3;
+import energypa.bems.essscheduling.service.EssSchService;
 import energypa.bems.login.domain.Member;
 import energypa.bems.login.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class EssSchThread implements Runnable {
 
     private final BuildingPerMinuteRepository buildingRepository;
     private final EssPredictResultRepository essRepository;
+    private final EssSchService essSchService;
 
     public static long buildingPerMinuteId = 1l;
     private boolean isRunning = true;
@@ -160,7 +162,7 @@ public class EssSchThread implements Runnable {
 
     private EssSchFrontResponseDto createJsonToBeSent(BuildingPerMinute bdConsumption, EssPredictResult aiDataFromDb) {
 
-        int consumption = sumConsumption(bdConsumption);
+        int consumption = essSchService.sumConsumption(bdConsumption);
 
         String timestamp = aiDataFromDb.getTimestamp().toString();
         Double batteryPower = aiDataFromDb.getBatteryPower();
@@ -229,8 +231,4 @@ public class EssSchThread implements Runnable {
 //    private String getTimestamp() {
 //        return essResponseDto.getTimestamp();
 //    }
-
-    private int sumConsumption(BuildingPerMinute bdConsumption) {
-        return (int) (bdConsumption.getA_Consumption() + bdConsumption.getB_Consumption() + bdConsumption.getC_Consumption());
-    }
 }

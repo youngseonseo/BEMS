@@ -79,7 +79,7 @@ public class EssSchService {
         return essScheduling.getTimestamp().toString();
     }
 
-    private int sumConsumption(BuildingPerMinute bdConsumption) {
+    public int sumConsumption(BuildingPerMinute bdConsumption) {
         return (int) (bdConsumption.getA_Consumption() + bdConsumption.getB_Consumption() + bdConsumption.getC_Consumption());
     }
 }

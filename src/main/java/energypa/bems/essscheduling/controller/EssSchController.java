@@ -37,16 +37,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EssSchController {
 
-    private final EssSchService essService;
     private final BuildingPerMinuteRepository buildingRepository;
     private final MemberRepository memberRepository;
     private final EssPredictResultRepository essRepository;
+    private final EssSchService essService;
 
     // 모니터링 시작 시점과 종료 시점 == 애플리케이션 실행 시작 시점 종료 시점
     @PostConstruct
     public void init() {
 
-        Thread essSchThread = new Thread(new EssSchThread(buildingRepository, essRepository));
+        Thread essSchThread = new Thread(new EssSchThread(buildingRepository, essRepository, essService));
         essSchThread.start();
     }
 
