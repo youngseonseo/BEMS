@@ -84,6 +84,11 @@ public class EssSchController {
             // 애플리케이션 관리자에게 알림 주는 코드
         }
 
+        if (essSchPrevData.size() < EssSchService.ESS_PREV_DATA_CNT) {
+            EssSchThread.isRunning = false;
+            log.info("전체 데이터 조회를 완료했습니다. ESS battery scheduling 모니터링을 종료합니다!");
+        }
+
         return ResponseEntity.ok(sseEmitter);
     }
 }

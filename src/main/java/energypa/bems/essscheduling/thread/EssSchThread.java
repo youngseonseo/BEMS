@@ -41,7 +41,7 @@ public class EssSchThread implements Runnable {
     private final EssSchService essSchService;
 
     public static long buildingPerMinuteId = 1l;
-    private boolean isRunning = true;
+    public static boolean isRunning = true;
 //    private EssSchAiResponseDto essResponseDto = null;
 
     public static Map<Long, SseEmitter> sseEmitters = new ConcurrentHashMap<>();

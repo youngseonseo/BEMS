@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EssSchService {
 
-    private static final long ESS_PREV_DATA_CNT = 150l;
+    public static final long ESS_PREV_DATA_CNT = 150l;
 
     private final BuildingPerMinuteRepository buildingRepository;
     private final EssPredictResultRepository essRepository;
@@ -29,11 +29,14 @@ public class EssSchService {
         List<BuildingPerMinute> bcPrevDataList = buildingRepository.getBuildingConsumptionPrevData(ESS_PREV_DATA_CNT, EssSchThread.buildingPerMinuteId);
         List<EssPredictResult> essPrevDataList = essRepository.getEssSchPrevData(ESS_PREV_DATA_CNT, EssSchThread.buildingPerMinuteId);
 
-        EssSchThread.buildingPerMinuteId += ESS_PREV_DATA_CNT;
+        int bcPrevDataCnt = bcPrevDataList.size();
+        int essPrevDataCnt = essPrevDataList.size();
+        int minCnt = bcPrevDataCnt < essPrevDataCnt ? bcPrevDataCnt : essPrevDataCnt;
+
+        EssSchThread.buildingPerMinuteId += minCnt;
 
         List<EssSchFrontResponseDto> essFrontPrevDataList = new ArrayList<>();
-
-        for(int i=0; i<ESS_PREV_DATA_CNT; i++) {
+        for(int i=0; i<minCnt; i++) {
 
             BuildingPerMinute buildingConsumption = bcPrevDataList.get(i);
             EssPredictResult essScheduling = essPrevDataList.get(i);
@@ -41,12 +44,11 @@ public class EssSchService {
             EssSchFrontResponseDto essFrontPrevData = EssSchFrontResponseDto.builder()
                     .graph1(getGraph1(buildingConsumption, essScheduling))
                     .graph2(getGraph2(buildingConsumption, essScheduling))
-                    .graph3(getGraph3(buildingConsumption, essScheduling))
+                    .graph3(getGraph3(essScheduling))
                     .build();
 
             essFrontPrevDataList.add(essFrontPrevData);
         }
-
         return essFrontPrevDataList;
     }
 
@@ -70,7 +72,7 @@ public class EssSchService {
                 .build();
     }
 
-    private Graph3 getGraph3(BuildingPerMinute buildingConsumption, EssPredictResult essScheduling) {
+    private Graph3 getGraph3(EssPredictResult essScheduling) {
 
         return Graph3.builder()
                 .timestamp(getTimestamp(essScheduling))
