@@ -24,13 +24,14 @@ public class EssSchService {
 
     public List<EssSchFrontResponseDto> getEssSchPrevData() {
 
-        List<BuildingPerMinute> bcPrevDataList = buildingRepository.getBuildingConsumptionPrevData(EssSchThread.buildingPerMinuteId);// offset 10에서 시작해서 500개 가져온다.
-        List<EssPredictResult> essPrevDataList = essRepository.getEssSchPrevData(EssSchThread.buildingPerMinuteId); // offset 10에서 시작해서 500개 가져온다.
-        EssSchThread.buildingPerMinuteId += 500;
+        List<BuildingPerMinute> bcPrevDataList = buildingRepository.getBuildingConsumptionPrevData(EssSchThread.buildingPerMinuteId);
+        List<EssPredictResult> essPrevDataList = essRepository.getEssSchPrevData(EssSchThread.buildingPerMinuteId);
+
+        EssSchThread.buildingPerMinuteId += 150;
 
         List<EssSchFrontResponseDto> essFrontPrevDataList = new ArrayList<>();
 
-        for(int i=0; i<500; i++) {
+        for(int i=0; i<150; i++) {
 
             BuildingPerMinute buildingConsumption = bcPrevDataList.get(i);
             EssPredictResult essScheduling = essPrevDataList.get(i);
