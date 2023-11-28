@@ -79,7 +79,7 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
 
     */
 
-    @Query(value = "select * from BuildingPerMinute limit 150 offset :offset",
+    @Query(value = "select * from BuildingPerMinute limit :limit offset :offset",
             nativeQuery = true)
-    List<BuildingPerMinute> getBuildingConsumptionPrevData(@Param("offset") long offset);
+    List<BuildingPerMinute> getBuildingConsumptionPrevData(@Param("limit") long limit, @Param("offset") long offset);
 }

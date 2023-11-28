@@ -19,19 +19,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EssSchService {
 
+    private static final long ESS_PREV_DATA_CNT = 150l;
+
     private final BuildingPerMinuteRepository buildingRepository;
     private final EssPredictResultRepository essRepository;
 
     public List<EssSchFrontResponseDto> getEssSchPrevData() {
 
-        List<BuildingPerMinute> bcPrevDataList = buildingRepository.getBuildingConsumptionPrevData(EssSchThread.buildingPerMinuteId);
-        List<EssPredictResult> essPrevDataList = essRepository.getEssSchPrevData(EssSchThread.buildingPerMinuteId);
+        List<BuildingPerMinute> bcPrevDataList = buildingRepository.getBuildingConsumptionPrevData(ESS_PREV_DATA_CNT, EssSchThread.buildingPerMinuteId);
+        List<EssPredictResult> essPrevDataList = essRepository.getEssSchPrevData(ESS_PREV_DATA_CNT, EssSchThread.buildingPerMinuteId);
 
-        EssSchThread.buildingPerMinuteId += 150;
+        EssSchThread.buildingPerMinuteId += ESS_PREV_DATA_CNT;
 
         List<EssSchFrontResponseDto> essFrontPrevDataList = new ArrayList<>();
 
-        for(int i=0; i<150; i++) {
+        for(int i=0; i<ESS_PREV_DATA_CNT; i++) {
 
             BuildingPerMinute buildingConsumption = bcPrevDataList.get(i);
             EssPredictResult essScheduling = essPrevDataList.get(i);
