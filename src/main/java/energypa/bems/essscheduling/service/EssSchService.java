@@ -4,12 +4,10 @@ import energypa.bems.energy.domain.BuildingPerMinute;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.ess.EssPredictResultRepository;
 import energypa.bems.ess.domain.EssPredictResult;
-import energypa.bems.essscheduling.dto.front.EssSchFrontResponseDto;
-import energypa.bems.essscheduling.dto.front.Graph1;
-import energypa.bems.essscheduling.dto.front.Graph2;
-import energypa.bems.essscheduling.dto.front.Graph3;
+import energypa.bems.essscheduling.dto.front.*;
 import energypa.bems.essscheduling.thread.EssSchThread;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.graph.Graph;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class EssSchService {
     private final BuildingPerMinuteRepository buildingRepository;
     private final EssPredictResultRepository essRepository;
 
-    public List<EssSchFrontResponseDto> getEssSchPrevData() {
+    public EssSchFrontPrevResponseDto getEssSchPrevData() {
 
         List<BuildingPerMinute> bcPrevDataList = buildingRepository.getBuildingConsumptionPrevData(ESS_PREV_DATA_CNT, EssSchThread.buildingPerMinuteId);
         List<EssPredictResult> essPrevDataList = essRepository.getEssSchPrevData(ESS_PREV_DATA_CNT, EssSchThread.buildingPerMinuteId);
@@ -35,21 +33,25 @@ public class EssSchService {
 
         EssSchThread.buildingPerMinuteId += minCnt;
 
-        List<EssSchFrontResponseDto> essFrontPrevDataList = new ArrayList<>();
+        List<Graph1> graph1 = new ArrayList<>();
+        List<Graph2> graph2 = new ArrayList<>();
+        List<Graph3> graph3 = new ArrayList<>();
+
         for(int i=0; i<minCnt; i++) {
 
             BuildingPerMinute buildingConsumption = bcPrevDataList.get(i);
             EssPredictResult essScheduling = essPrevDataList.get(i);
 
-            EssSchFrontResponseDto essFrontPrevData = EssSchFrontResponseDto.builder()
-                    .graph1(getGraph1(buildingConsumption, essScheduling))
-                    .graph2(getGraph2(buildingConsumption, essScheduling))
-                    .graph3(getGraph3(essScheduling))
-                    .build();
-
-            essFrontPrevDataList.add(essFrontPrevData);
+            graph1.add(getGraph1(buildingConsumption, essScheduling));
+            graph2.add(getGraph2(buildingConsumption, essScheduling));
+            graph3.add(getGraph3(essScheduling));
         }
-        return essFrontPrevDataList;
+
+        return EssSchFrontPrevResponseDto.builder()
+                .graph1(graph1)
+                .graph2(graph2)
+                .graph3(graph3)
+                .build();
     }
 
     private Graph1 getGraph1(BuildingPerMinute buildingConsumption, EssPredictResult essScheduling) {

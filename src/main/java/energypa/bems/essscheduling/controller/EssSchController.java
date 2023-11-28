@@ -3,6 +3,7 @@ package energypa.bems.essscheduling.controller;
 import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.ess.EssPredictResultRepository;
 import energypa.bems.ess.domain.EssPredictResult;
+import energypa.bems.essscheduling.dto.front.EssSchFrontPrevResponseDto;
 import energypa.bems.essscheduling.dto.front.EssSchFrontResponseDto;
 import energypa.bems.essscheduling.service.EssSchService;
 import energypa.bems.essscheduling.thread.EssSchThread;
@@ -55,7 +56,7 @@ public class EssSchController {
             @ApiResponse(
                     responseCode = "200",
                     description = "ESS battery scheduling 모니터링 요청 성공",
-                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EssSchFrontResponseDto.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EssSchFrontPrevResponseDto.class))
             )
     })
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -72,7 +73,7 @@ public class EssSchController {
             EssSchThread.sseEmitters.put(memberId, sseEmitter);
         }
 
-        List<EssSchFrontResponseDto> essSchPrevData = essService.getEssSchPrevData();
+        EssSchFrontPrevResponseDto essSchPrevData = essService.getEssSchPrevData();
         log.info("[ESS prevData] " + essSchPrevData); //
         try {
             sseEmitter.send(SseEmitter.event()
@@ -84,7 +85,7 @@ public class EssSchController {
             // 애플리케이션 관리자에게 알림 주는 코드
         }
 
-        if (essSchPrevData.size() < EssSchService.ESS_PREV_DATA_CNT) {
+        if (essSchPrevData.getGraph1().size() < EssSchService.ESS_PREV_DATA_CNT) {
             EssSchThread.isRunning = false;
             log.info("전체 데이터 조회를 완료했습니다. ESS battery scheduling 모니터링을 종료합니다!");
         }
