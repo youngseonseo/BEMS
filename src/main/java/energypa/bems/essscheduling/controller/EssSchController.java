@@ -4,6 +4,7 @@ import energypa.bems.energy.repository.BuildingPerMinuteRepository;
 import energypa.bems.ess.EssPredictResultRepository;
 import energypa.bems.ess.domain.EssPredictResult;
 import energypa.bems.essscheduling.dto.front.EssSchFrontResponseDto;
+import energypa.bems.essscheduling.service.EssSchService;
 import energypa.bems.essscheduling.thread.EssSchThread;
 import energypa.bems.login.config.security.token.CurrentUser;
 import energypa.bems.login.config.security.token.UserPrincipal;
@@ -36,6 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EssSchController {
 
+    private final EssSchService essService;
     private final BuildingPerMinuteRepository buildingRepository;
     private final MemberRepository memberRepository;
     private final EssPredictResultRepository essRepository;
@@ -58,9 +60,11 @@ public class EssSchController {
     })
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> monitorEss(@CurrentUser UserPrincipal userPrincipal) {
+//    public ResponseEntity<SseEmitter> monitorEss() {
 
         Member member = memberRepository.findById(userPrincipal.getId()).get();
         long memberId = member.getId();
+//        long memberId = 2l;
 
         SseEmitter sseEmitter = EssSchThread.sseEmitters.get(memberId);
         if (sseEmitter == null) {
@@ -68,8 +72,7 @@ public class EssSchController {
             EssSchThread.sseEmitters.put(memberId, sseEmitter);
         }
 
-        List<EssPredictResult> essSchPrevData = essRepository.getEssSchPrevData(EssSchThread.buildingPerMinuteId);
-        EssSchThread.buildingPerMinuteId += 500;
+        List<EssSchFrontResponseDto> essSchPrevData = essService.getEssSchPrevData();
         log.info("[ESS prevData] " + essSchPrevData); //
         try {
             sseEmitter.send(SseEmitter.event()

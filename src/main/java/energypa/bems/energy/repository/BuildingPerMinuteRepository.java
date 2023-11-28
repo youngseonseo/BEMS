@@ -1,6 +1,7 @@
 package energypa.bems.energy.repository;
 
 import energypa.bems.energy.domain.BuildingPerMinute;
+import energypa.bems.ess.domain.EssPredictResult;
 import energypa.bems.ess.dto.BusDto;
 import energypa.bems.ess.dto.RateConsumptionDto;
 import energypa.bems.monitoring.dto.Graph1Dto;
@@ -78,4 +79,7 @@ public interface BuildingPerMinuteRepository extends JpaRepository<BuildingPerMi
 
     */
 
+    @Query(value = "select * from BuildingPerMinute limit 500 offset :offset",
+            nativeQuery = true)
+    List<BuildingPerMinute> getBuildingConsumptionPrevData(@Param("offset") long offset);
 }
