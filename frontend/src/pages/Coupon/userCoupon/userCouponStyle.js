@@ -42,3 +42,7 @@ export const InfoOfCoupon = styled.div`
   width: 700px;
   border-radius: 10px;
 `;
+
+export const DeleteButton = styled.button`
+  width: 150px;
+`;

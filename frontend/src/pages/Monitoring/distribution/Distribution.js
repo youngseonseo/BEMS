@@ -23,54 +23,13 @@ import {
   ElectricImg,
 } from "./DistributionStyle";
 
-export default function ElectricDistributionPage({ isopened }) {
-  const [a_bus, setAbus] = useState();
-  const [b_bus, setBbus] = useState();
-  const [c_bus, setCbus] = useState();
+export default function ElectricDistributionPage({
+  isopened,
+  a_bus,
+  b_bus,
+  c_bus,
+}) {
   const token = localStorage.getItem("accessToken");
-  const SSE = () => {
-    const subscribeUrl = "http://localhost:8080/api/sub";
-
-    if (token != null) {
-      console.log("SSE ", token);
-      let eventSource2 = new EventSourcePolyfill(subscribeUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "text/event-stream",
-        },
-        heartbeatTimeout: 10 * 60 * 1000,
-        withCredentials: true,
-      });
-
-      eventSource2.onopen = (event) => {
-        console.log("this is opened", event);
-      };
-      eventSource2.addEventListener("ess", (event) => {
-        const json = JSON.parse(event.data);
-
-        setAbus(json.a_bus);
-        setBbus(json.b_bus);
-        setCbus(json.c_bus);
-      });
-      eventSource2.addEventListener("error", (e) => {
-        console.log("An error occurred while attempting to connect.");
-        eventSource2.close();
-      });
-    }
-  };
-
-  const postESS = () => {
-    const accessToken = localStorage.getItem("accessToken");
-    axios.post("http://localhost:8080/api/ess/monitor");
-  };
-
-  useEffect(() => {
-    SSE();
-  }, [token]);
-
-  useEffect(() => {
-    postESS();
-  }, []);
 
   return (
     <div>

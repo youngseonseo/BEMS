@@ -65,7 +65,34 @@ export default function FloorBillEnergyPage() {
       elec_price: price[2],
     },
   ];
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip" style={{ background: "white" }}>
+          <p
+            className="label"
+            style={{ color: "black", fontWeight: "bold" }}
+          >{`요금: ${payload[0].value.toLocaleString()}원`}</p>
+        </div>
+      );
+    }
 
+    return null;
+  };
+  const CustomToolti2 = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip" style={{ background: "white" }}>
+          <p
+            className="label"
+            style={{ color: "black", fontWeight: "bold" }}
+          >{`전력량: ${payload[0].value.toLocaleString()}kW`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
   useEffect(() => {
     getBill();
   }, []);
@@ -103,7 +130,7 @@ export default function FloorBillEnergyPage() {
                 data={PriceData}
                 margin={{ top: 20, bottom: 20, left: 25 }}
               >
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <XAxis dataKey="date" stroke="white" />
                 <YAxis stroke="white" tickFormatter={formatYAxis} />
                 <Bar dataKey="elec_price" fill="#8884d8" barSize={40} />
@@ -119,7 +146,7 @@ export default function FloorBillEnergyPage() {
               >
                 <XAxis dataKey="date" stroke="white" />
                 <YAxis stroke="white" tickFormatter={formatYAxis} />
-                <Tooltip />
+                <Tooltip content={<CustomToolti2 />} />
                 <Bar dataKey="elec_consumtion" fill="#f7d954" barSize={40} />
               </BarChart>
             </Graph2Cont>

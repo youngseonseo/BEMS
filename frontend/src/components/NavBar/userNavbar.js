@@ -1,16 +1,30 @@
+import { useEffect, useState } from "react";
 import { BigNavcoupon, BigNavsetting } from "./navbarStyle";
 
 import { NavContainer, BigNavBill, BigNavManage } from "./userNavbarStyle";
 
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function UserNavigationBar(props) {
+  const token = localStorage.getItem("accessToken");
+  const [userid, setUserId] = useState();
+  const getUserInfo = async () => {
+    await axios
+      .get("http://localhost:8080/api/auth/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setUserId(res.data.information.id);
+      });
+  };
   const navigate = useNavigate();
   const onclickfloorbill = () => {
     navigate("/main/user/bill");
   };
   const onclickcoupon = () => {
-    navigate("/main/user/coupon");
+    navigate(`/main/user/coupon/${userid}`);
   };
   const onclicksetting = () => {
     navigate("/main/user/setting");
@@ -18,7 +32,9 @@ export default function UserNavigationBar(props) {
   const onclickEnergyManagement = () => {
     navigate("/main/user/energymanagement");
   };
-
+  useEffect(() => {
+    getUserInfo();
+  }, []);
   return (
     <NavContainer>
       <BigNavBill name={props.name} onClick={onclickfloorbill}>

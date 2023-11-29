@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import UserNavigationBar from "../../../components/NavBar/userNavbar";
 import MainHeader from "../../../components/MainHeader/header";
 import { BackGround } from "../../Monitoring/distribution/DistributionStyle";
@@ -19,7 +19,31 @@ import {
 
 export default function UserSettingPage() {
   const [userInfo, setUserInfo] = useState([]);
+  const [imgFile, setImgFile] = useState("");
+  // 이미지 파일 gallary로 POST
+  const ref = useRef(null);
+  const onUploadButtonClick = (event) => {
+    ref.current.click();
+  };
 
+  const readImage = async (event) => {
+    console.log(event.target.files?.[0]);
+    const accessToken = localStorage.getItem("accessToken");
+    const formData = new FormData();
+    formData.append("file", event.target.files?.[0]);
+    console.log(formData);
+
+    await fetch("http://localhost:8080/api/gallery", {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${accessToken}` }, // fetch 를 쓸때는 'Content-Type': 'multipart/form-data' 쓰지 않기, axios에서는 필요
+      body: formData,
+    })
+      .then((response) => response.text())
+      .then((result) => {
+        console.log("image-url: ", result);
+        setImgFile(result);
+      });
+  };
   const applyManager = () => {
     const token = localStorage.getItem("accessToken");
     axios({
@@ -81,7 +105,14 @@ export default function UserSettingPage() {
       <MainHeader />
       <BackGround>
         <UserNavigationBar name="setting" />
-        <SettingContainer>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+            width: "75vw",
+          }}
+        >
           <ImageChangeDiv>
             <UserImg
               src={userInfo?.imageUrl}
@@ -89,7 +120,17 @@ export default function UserSettingPage() {
               height="200px"
               alt="userImageSetting"
             />
-            <ImgButton>프로필 이미지 변경</ImgButton>
+            <input
+              hidden
+              type="file"
+              accept="image/*"
+              multiple={false}
+              ref={ref}
+              onChange={readImage}
+            />
+            <ImgButton onClick={onUploadButtonClick}>
+              프로필 이미지 변경
+            </ImgButton>
           </ImageChangeDiv>
           <CheckUserInfo>
             <div>이름 : {userInfo?.username}</div>
@@ -111,7 +152,7 @@ export default function UserSettingPage() {
 
             <DeleteButton>회원 탈퇴</DeleteButton>
           </ButtonGroup>
-        </SettingContainer>
+        </div>
       </BackGround>
     </div>
   );

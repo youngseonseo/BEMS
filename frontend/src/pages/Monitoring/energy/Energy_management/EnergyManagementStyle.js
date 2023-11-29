@@ -38,7 +38,7 @@ export const ConsumptionPattern2 = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 300px;
+  height: 350px;
   width: auto;
   color: white;
   padding: 10px;

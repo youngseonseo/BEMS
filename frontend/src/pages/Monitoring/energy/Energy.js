@@ -19,7 +19,6 @@ import {
   ComposedChart,
   BarChart,
   Bar,
-  AreaChart,
   Area,
   LineChart,
   Line,
@@ -37,8 +36,8 @@ export default function EnergyConsumptionMonitoring() {
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
-  const [input, setInput] = useState([]);
-  const [Check, setCheck] = useState(false);
+  const [input, setInput] = useState([]); //eslint-disable-line no-unused-vars
+  const [Check, setCheck] = useState(false); //eslint-disable-line no-unused-vars
   const [ghDuration, setGhDuration] = useState("date");
   const moment = require("moment");
 
@@ -102,9 +101,58 @@ export default function EnergyConsumptionMonitoring() {
     { name: "563동", value: data2.totalCConsumption },
   ];
   const colors = ["#3D87FF", "#A665F5", "#FA995C"];
+  const CustomTooltip2 = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="label">{`${formatXAxis(label)}`}</p>
+          <p className="label">{`${
+            payload[0].name
+          } : ${payload[0].value.toLocaleString()} kW`}</p>
+          <p className="label">{`${
+            payload[1].name
+          } : ${payload[1].value.toLocaleString()} kW`}</p>
+          <p className="label">{`${
+            payload[2].name
+          } : ${payload[2].value.toLocaleString()} kW`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="label">{` ${payload[0].value.toLocaleString()} kW`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+  const CustomTooltip3 = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="label">{`${moment(label).format("M/D hh:mm")}`}</p>
+          <p className="label">{`${
+            payload[0].name
+          } : ${payload[0].value.toLocaleString()} kW`}</p>
+          <p className="label">{`${
+            payload[1].name
+          } : ${payload[1].value.toLocaleString()} kW`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   useEffect(() => {
     postDate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ghDuration]);
 
   return (
@@ -146,7 +194,7 @@ export default function EnergyConsumptionMonitoring() {
                     position: "top",
                   }}
                 />
-                <Tooltip />
+                <Tooltip content={<CustomTooltip3 />} />
                 <Area
                   name="총 전력 소비량"
                   type="monotone"
@@ -196,7 +244,7 @@ export default function EnergyConsumptionMonitoring() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={formatYAxis} />
-                  <Tooltip />
+                  <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="value" barSize={50}>
                     {data2format.map((value, index) => (
                       <Cell
@@ -235,7 +283,7 @@ export default function EnergyConsumptionMonitoring() {
                       position: "top",
                     }}
                   />
-                  <Tooltip />
+                  <Tooltip content={<CustomTooltip2 />} />
                   <Legend />
                   <Line
                     name="561동"

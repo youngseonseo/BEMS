@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 import {
   SignupContainer,
   InputSign,
@@ -70,7 +70,27 @@ export default function SignupPage() {
       .then((result) => {
         console.log("결과: ", result);
         if (result.check === true) {
-          alert(result.information.message);
+          if (userData.floor === "0") {
+            console.log("apply manager");
+            axios
+              .post("http://localhost:8080/api/auth/signin", {
+                email: userData.email,
+                password: userData.password,
+              })
+              .then((res) => {
+                console.log(res);
+                return res.data.accessToken;
+              })
+              .then((res) => {
+                console.log(res);
+                axios({
+                  method: "post",
+                  url: "http://localhost:8080/api/manager/apply",
+                  headers: { Authorization: `Bearer ${res}` },
+                });
+              });
+          }
+          alert("회원가입이 완료되었습니다.");
           navigate("/login");
         } else {
           alert(result.information.message);

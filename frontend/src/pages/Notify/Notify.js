@@ -50,6 +50,7 @@ export default function NorificationPage() {
       .then((res) => {
         console.log(res);
         alert("알림이 모두 삭제 되었습니다.");
+        window.location.replace("/main/notify");
       });
   };
 

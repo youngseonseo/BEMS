@@ -1,5 +1,10 @@
 import styled from "styled-components";
-
+export const BackGround = styled.div`
+  display: flex;
+  background-color: #292929;
+  padding: 50px 50px;
+  height: auto;
+`;
 export const DeleteButton = styled.button`
   background-color: #ffffff;
   opacity: 30%;
@@ -43,9 +48,9 @@ export const UserImg = styled.img`
 
 export const SettingContainer = styled.div`
   display: flex;
-  width: 100vw;
-  gap: 40px;
-  justify-content: space-around;
+  flex-direction: column;
+  padding: 0px 40px;
+  gap: 20px;
 `;
 
 export const ImageChangeDiv = styled.div`
@@ -70,10 +75,9 @@ export const ImgButton = styled.button`
 `;
 
 export const CheckUserInfo = styled.div`
-  width: 350px;
+  width: 300px;
   height: 200px;
   color: white;
-
   background-color: gray;
   font-size: 15px;
   font-weight: bold;
@@ -95,4 +99,36 @@ export const ButtonGroup = styled.div`
 export const InfoManager = styled.div`
   color: #e16b6b;
   font-size: 13px;
+`;
+
+export const ManagerList = styled.div`
+  display: flex;
+  background-color: #353535;
+  border-radius: 10px;
+  color: white;
+  align-items: center;
+
+  padding: 0px 25px;
+  height: 50px;
+  width: 70vw;
+  gap: 75px;
+`;
+export const ManagerEnroll = styled.div`
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  color: white;
+  align-items: center;
+  padding: 0px 25px;
+  gap: 20px;
+`;
+
+export const Enrollbutton = styled.button`
+  width: 70px;
+  height: 30px;
+  border-radius: 10px;
+
+  &:hover {
+    border: 3px solid gray;
+  }
 `;

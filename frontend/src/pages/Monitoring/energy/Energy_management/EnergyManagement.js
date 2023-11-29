@@ -79,8 +79,11 @@ export default function EnergyManagementUserPage() {
 
     return (
       <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill="white">
+        <text x={cx} y={cy - 10} dy={8} textAnchor="middle" fill="white">
           {`총 소비량 `}
+        </text>
+        <text x={cx} y={cy + 10} dy={8} textAnchor="middle" fill="white">
+          {`${consumption.totalConsumption} kwh`}
         </text>
         <Sector
           cx={cx}
@@ -196,21 +199,19 @@ export default function EnergyManagementUserPage() {
               <Subtitle>우리집 ESS 배터리 이용 절약 요금</Subtitle>
               <BatterySave style={{ width: "350px" }}>
                 <div>
-                  하루
-                  <SaveBox>
-                    - {saveCost?.daySaveCost?.toLocaleString()}원
-                  </SaveBox>
+                  전일
+                  <SaveBox>{saveCost?.daySaveCost?.toLocaleString()}원</SaveBox>
                 </div>
                 <div>
                   일주일
                   <SaveBox>
-                    - {saveCost?.weekSaveCost?.toLocaleString()}원
+                    {saveCost?.weekSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
                 <div>
                   이번달
                   <SaveBox>
-                    - {saveCost?.monthSaveCost?.toLocaleString()}원
+                    {saveCost?.monthSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
               </BatterySave>

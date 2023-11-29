@@ -79,8 +79,11 @@ export default function BuildingEnergyManagementPage() {
 
     return (
       <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill="white">
+        <text x={cx} y={cy - 10} dy={8} textAnchor="middle" fill="white">
           {`총 소비량 `}
+        </text>
+        <text x={cx} y={cy + 10} dy={8} textAnchor="middle" fill="white">
+          {`${consumption.totalConsumption} kwh`}
         </text>
         <Sector
           cx={cx}
@@ -191,74 +194,84 @@ export default function BuildingEnergyManagementPage() {
               입니다.
             </TextPattern>
           </ConsumptionPattern>
+          <Subtitle
+            style={{
+              fontSize: "21px",
+              position: "relative",
+              top: "25px",
+              left: "10px",
+            }}
+          >
+            ESS 배터리 이용 후 절약요금
+          </Subtitle>
           <ConsumptionPattern2>
             <div>
-              <Subtitle>561동 절약 요금</Subtitle>
+              <Subtitle>561동</Subtitle>
               <BatterySave>
                 <div>
-                  하루
+                  전일
                   <SaveBox>
-                    - {saveCost561?.daySaveCost?.toLocaleString()}원
+                    {saveCost561?.daySaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
 
                 <div>
                   일주일
                   <SaveBox>
-                    - {saveCost561?.weekSaveCost?.toLocaleString()}원
+                    {saveCost561?.weekSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
                 <div>
                   한달
                   <SaveBox>
-                    - {saveCost561?.monthSaveCost?.toLocaleString()}원
+                    {saveCost561?.monthSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
               </BatterySave>
             </div>
             <div>
-              <Subtitle>562동 절약 요금</Subtitle>
+              <Subtitle>562동</Subtitle>
               <BatterySave>
                 <div>
-                  하루
+                  전일
                   <SaveBox>
-                    - {saveCost562?.daySaveCost?.toLocaleString()}원
+                    {saveCost562?.daySaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
 
                 <div>
                   일주일
                   <SaveBox>
-                    - {saveCost562?.weekSaveCost?.toLocaleString()}원
+                    {saveCost562?.weekSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
                 <div>
                   한달
                   <SaveBox>
-                    - {saveCost562?.monthSaveCost?.toLocaleString()}원
+                    {saveCost562?.monthSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
               </BatterySave>
             </div>
             <div>
-              <Subtitle>563동 절약 요금</Subtitle>
+              <Subtitle>563동</Subtitle>
               <BatterySave>
                 <div>
-                  하루
+                  전일
                   <SaveBox>
-                    - {saveCost563?.daySaveCost?.toLocaleString()}원
+                    {saveCost563?.daySaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
                 <div>
                   일주일
                   <SaveBox>
-                    - {saveCost563?.weekSaveCost?.toLocaleString()}원
+                    {saveCost563?.weekSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
                 <div>
                   한달
                   <SaveBox>
-                    - {saveCost563?.monthSaveCost?.toLocaleString()}원
+                    {saveCost563?.monthSaveCost?.toLocaleString()}원
                   </SaveBox>
                 </div>
               </BatterySave>

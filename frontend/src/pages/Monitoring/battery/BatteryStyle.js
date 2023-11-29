@@ -3,6 +3,7 @@ export const BatteryBackground = styled.div`
   width: 75vw;
   height: auto;
   padding: 0px 40px;
+  gap: 20px;
   display: flex;
   flex-direction: column;
 `;
@@ -70,4 +71,5 @@ export const BatteryGraph = styled.div`
   background-color: #353535;
   padding: 20px;
   color: white;
+  gap: 15px;
 `;
