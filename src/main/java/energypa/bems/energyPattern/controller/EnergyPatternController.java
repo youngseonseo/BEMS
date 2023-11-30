@@ -36,7 +36,7 @@ public class EnergyPatternController {
         Integer building = member.getBuilding();
 
         LocalDate localDate =LocalDate.now();
-        EnergyCompareDto energyCompareDto = new EnergyCompareDto(297, 217, -18);
+        EnergyCompareDto energyCompareDto = new EnergyCompareDto(489, 415, -18);
         EnergyConsumptionDto energyConsumptionDto = new EnergyConsumptionDto(7, 28.25, 25.75, 29.00, 17.00, 13, 19);
         int i, k; // 빌딩과 세대수 지정
         if(building == 561) {
