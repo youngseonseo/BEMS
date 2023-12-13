@@ -100,14 +100,14 @@ public class MonitoringService {
         LocalDateTime now = LocalDateTime.now();
         now = now.minusYears(0L);
         now = now.minusMonths(3L);
-        return now.minusDays(6L).withMinute(0).withSecond(0).withNano(0);
+        return now.minusDays(15L).withMinute(0).withSecond(0).withNano(0);
     }
     public LocalDateTime manipulateNowForBuildingforGraph2() {
 
         LocalDateTime now = LocalDateTime.now();
         now = now.minusYears(1L);
         now = now.minusMonths(2L);
-        return now.plusDays(8L);
+        return now.plusDays(1L);
     }
 
     public String getYesterday() {

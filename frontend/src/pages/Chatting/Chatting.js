@@ -75,13 +75,16 @@ export default function ChattingPage() {
       /* 서버와의 websocket 연결 종료 */
       socket.current.onclose = () => {
         console.log("서버와의 websocket 연결이 종료되었습니다!");
+        socket.current.onopen = () => {
+          console.log("서버와의 websocket 연결이 성공적으로 이뤄졌습니다!");
+        };
       };
       /* websocket 연결에 오류 발생 */
       socket.current.onerror = (error) => {
         console.log("websocket 연결에 오류가 발생했습니다:", error);
       };
     }
-    return; // eslint-disable-next-line react-hooks/exhaustive-deps
+    return;
   }, []);
   const onClicksendMessage = (event) => {
     event.preventDefault();

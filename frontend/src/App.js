@@ -21,6 +21,10 @@ import axios from "axios";
 
 function App() {
   const [isopened, setOpen] = useState(false);
+  const [data1, setData1] = useState([]);
+  const [data2, setData2] = useState([]);
+  const [data3, setData3] = useState([]);
+  const [sendBattery, setSendBattery] = useState(false);
 
   const [a_bus, setAbus] = useState();
   const [b_bus, setBbus] = useState();
@@ -29,6 +33,50 @@ function App() {
   const SendingStart = () => {
     //eslint-disable-line no-unused-vars
     axios.post("http://localhost:8080/api/ess/monitor");
+  };
+
+  const ESSScheduling = () => {
+    const token = localStorage.getItem("accessToken");
+    const subscribeUrl = "http://localhost:8080/api/ess";
+
+    if (token != null) {
+      console.log("SSE ", token);
+      let eventSourceess = new EventSourcePolyfill(subscribeUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "text/event-stream",
+        },
+        heartbeatTimeout: 10 * 60 * 1000,
+        withCredentials: true,
+      });
+
+      eventSourceess.onopen = (event) => {
+        console.log("this is opened", event);
+
+        //if (sendBattery === false && token != null) {
+        //   SendingStart();
+        // }
+      };
+      eventSourceess.addEventListener("essBatteryScheduling", (event) => {
+        const json = JSON.parse(event.data);
+        setSendBattery(true);
+        setData1((prev) => [...prev, json.graph1]);
+        setData2((prev) => [...prev, json.graph2]);
+        setData3((prev) => [...prev, json.graph3]);
+      });
+      eventSourceess.addEventListener("getEssSchPrevData", (event) => {
+        const json = JSON.parse(event.data);
+        console.log(json);
+        setData1(json.graph1);
+        setData2(json.graph2);
+        setData3(json.graph3);
+      });
+
+      eventSourceess.addEventListener("error", (e) => {
+        console.log("An error occurred while attempting to connect.");
+        eventSourceess.close();
+      });
+    }
   };
   const SSE = () => {
     const subscribeUrl = "http://localhost:8080/api/sub";
@@ -72,6 +120,10 @@ function App() {
   useEffect(() => {
     SSE(); // eslint-disable-next-line react-hooks/exhaustive-deps
     SendingStart();
+    if (sendBattery === false) {
+      ESSScheduling();
+      setSendBattery(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -87,7 +139,10 @@ function App() {
           path="/main/monitoring/energy_consumption"
           element={<EnergyConsumptionMonitoring />}
         />
-        <Route path="/main/monitoring/battery" element={<BatteryPage />} />
+        <Route
+          path="/main/monitoring/battery"
+          element={<BatteryPage data1={data1} data2={data2} data3={data3} />}
+        />
         <Route
           path="/main/monitoring/power_distribution"
           element={

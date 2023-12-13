@@ -8,7 +8,7 @@ export const SignupContainer = styled.div`
   /* Rectangle 20 */
   box-sizing: border-box;
   width: 400px;
-  height: 550px;
+  height: 450px;
   background: #302e2e;
   border: 2px solid rgba(245, 245, 245, 0.34);
   position: relative;
@@ -23,7 +23,7 @@ export const SignupContainer = styled.div`
 `;
 export const GroundContainer = styled.div`
   width: 400px;
-  height: 550px;
+  height: 450px;
   background: #302e2e;
   border: 2px solid rgba(245, 245, 245, 0.34);
   margin: 0 auto;
