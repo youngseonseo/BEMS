@@ -8,7 +8,6 @@ import {
   InputBox,
   SmallButton,
   ButtonGroup,
-  BigButton,
   SignupSubject,
   GroundContainer,
   ImageButton,
@@ -235,10 +234,6 @@ export default function SignupPage() {
                 </select>
               </InputBox>
             )}
-
-            <BigButton>네이버로 로그인</BigButton>
-            <BigButton>카카오로 로그인</BigButton>
-            <BigButton>구글로 로그인</BigButton>
             <ButtonGroup>
               <SmallButton onClick={registerFetch}>Sign up</SmallButton>
               <SmallButton onClick={pushLoginpage}>Log in</SmallButton>

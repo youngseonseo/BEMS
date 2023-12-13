@@ -11,7 +11,7 @@ export const LoginContainer = styled.div`
   /* Rectangle 20 */
   box-sizing: border-box;
   width: 400px;
-  height: 430px;
+  height: 300px;
   background: #302e2e;
   border: 2px solid rgba(245, 245, 245, 0.34);
 
@@ -24,7 +24,7 @@ export const LoginContainer = styled.div`
 export const GroundContainer = styled.div`
   margin: 0 auto;
   width: 400px;
-  height: 430px;
+  height: 300px;
   background: #302e2e;
   border: 2px solid rgba(245, 245, 245, 0.34);
 `;
@@ -32,8 +32,8 @@ export const GroundContainer = styled.div`
 export const ButtonGroup = styled.div`
   display: flex;
   justify-content: center;
-  padding: 10px 0px;
-  gap: 10px;
+  padding: 20px 0px;
+  gap: 20px;
 `;
 
 export const LoginSubject = styled.h1`

@@ -7,7 +7,6 @@ import {
   BackGround,
   InputBox,
   SmallButton,
-  BigButton,
   LoginContainer,
   GroundContainer,
   ButtonGroup,
@@ -108,9 +107,6 @@ export default function LoginPage() {
             <SmallButton onClick={pushSignuppage}>Sign up</SmallButton>
             <SmallButton onClick={onClickLogin}>Log in</SmallButton>
           </ButtonGroup>
-          <BigButton>네이버로 로그인</BigButton>
-          <BigButton>카카오로 로그인</BigButton>
-          <BigButton>구글로 로그인</BigButton>
         </LoginContainer>
       </GroundContainer>
     </BackGround>

@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import UserNavigationBar from "../../../../components/NavBar/userNavbar";
@@ -95,6 +94,7 @@ export default function FloorBillEnergyPage() {
   };
   useEffect(() => {
     getBill();
+    // eslint-disable-next-line
   }, []);
 
   return (
@@ -139,7 +139,7 @@ export default function FloorBillEnergyPage() {
             <Graph2Cont>
               전력 사용량 (kw)
               <BarChart
-                width={350}
+                width={400}
                 height={350}
                 data={Consumdata}
                 margin={{ top: 20, bottom: 20, left: 10 }}
